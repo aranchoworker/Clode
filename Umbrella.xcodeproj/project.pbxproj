@@ -1,0 +1,1073 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		048B18E544A0101700000043 /* WeatherService.swift in app */ = {
+			isa = PBXBuildFile;
+			fileRef = D627553E66F78FAD00000010;
+		};
+		072A93785755752800000036 /* SettingsView.swift in app */ = {
+			isa = PBXBuildFile;
+			fileRef = 25CD7A3B0389EDCC00000017;
+		};
+		0F1EC586E9FD7BA80000003A /* CalendarTime.swift in app */ = {
+			isa = PBXBuildFile;
+			fileRef = 60F825C8BA397B0D00000007;
+		};
+		127D2B6ACDE184070000005D /* SchedulingAndDisplayTests.swift in tests */ = {
+			isa = PBXBuildFile;
+			fileRef = 97DE1B35E8B5C88F00000026;
+		};
+		13C40692BC2F06C70000006A /* WeatherModels.swift in tests */ = {
+			isa = PBXBuildFile;
+			fileRef = 32DFA86716CA43CD0000000F;
+		};
+		184F20157D9FF3C800000062 /* AppConstants.swift in tests */ = {
+			isa = PBXBuildFile;
+			fileRef = 0CEF26B39063AC1F00000005;
+		};
+		1FD6DC3B1592CAF80000004F /* LocationProvider.swift in widget */ = {
+			isa = PBXBuildFile;
+			fileRef = 7373C0F23FD0791500000008;
+		};
+		22ABC4CC6E8B482F00000040 /* UmbrellaRefresher.swift in app */ = {
+			isa = PBXBuildFile;
+			fileRef = E44EA6C0B9793F280000000D;
+		};
+		254BC51E6FAB83CD00000050 /* SharedStore.swift in widget */ = {
+			isa = PBXBuildFile;
+			fileRef = 3EF9F3E2791B733100000009;
+		};
+		257402B5136FEAEF00000032 /* BackgroundRefreshScheduler.swift in app */ = {
+			isa = PBXBuildFile;
+			fileRef = F706898422D3C06200000013;
+		};
+		2C5E47C656CD109D0000005E /* SharedStoreTests.swift in tests */ = {
+			isa = PBXBuildFile;
+			fileRef = E28CD06705020E9800000027;
+		};
+		2E51B17E012651A100000042 /* WeatherModels.swift in app */ = {
+			isa = PBXBuildFile;
+			fileRef = 32DFA86716CA43CD0000000F;
+		};
+		3B56CA179B3D212C00000068 /* UmbrellaDecision.swift in tests */ = {
+			isa = PBXBuildFile;
+			fileRef = B087D46F065DA13E0000000C;
+		};
+		3F3ECAF1C0CDF6A100000033 /* HomeView.swift in app */ = {
+			isa = PBXBuildFile;
+			fileRef = 0A6E5850A5E896E500000014;
+		};
+		41AA415A4EEBCAF40000006E /* UmbrellaWidgetExtension.appex in Embed Foundation Extensions */ = {
+			isa = PBXBuildFile;
+			fileRef = 1B442E42980596EB00000002;
+			settings = {
+				ATTRIBUTES = (
+					RemoveHeadersOnCopy,
+				);
+			};
+		};
+		497A337DE6FCB97700000039 /* BackgroundRefreshPlanner.swift in app */ = {
+			isa = PBXBuildFile;
+			fileRef = B539CBD8FBB84FFA00000006;
+		};
+		4AA7C975F71FA3FB0000004A /* UmbrellaWidgetBundle.swift in widget */ = {
+			isa = PBXBuildFile;
+			fileRef = 68ABFA29DE2B785B0000001F;
+		};
+		59A651E85DFACB110000006B /* WeatherService.swift in tests */ = {
+			isa = PBXBuildFile;
+			fileRef = D627553E66F78FAD00000010;
+		};
+		64516E8224D9D7A800000066 /* SnapshotFallback.swift in tests */ = {
+			isa = PBXBuildFile;
+			fileRef = E2AA65588BDD88B00000000A;
+		};
+		6B40B3C00E4ECB6300000045 /* Assets.xcassets in app */ = {
+			isa = PBXBuildFile;
+			fileRef = CEFC84C9451816CC00000019;
+		};
+		7FD12B0FF635E1C000000051 /* SnapshotFallback.swift in widget */ = {
+			isa = PBXBuildFile;
+			fileRef = E2AA65588BDD88B00000000A;
+		};
+		820832BCBA5426BD00000064 /* CalendarTime.swift in tests */ = {
+			isa = PBXBuildFile;
+			fileRef = 60F825C8BA397B0D00000007;
+		};
+		8773F260CAF50A0C00000057 /* WeatherService.swift in widget */ = {
+			isa = PBXBuildFile;
+			fileRef = D627553E66F78FAD00000010;
+		};
+		88601FA415D575B400000037 /* UmbrellaAppApp.swift in app */ = {
+			isa = PBXBuildFile;
+			fileRef = 819AFA168B2033ED00000018;
+		};
+		886D88C51C6B47920000003E /* TimelinePlanner.swift in app */ = {
+			isa = PBXBuildFile;
+			fileRef = 8AE18A53ADCF7CB70000000B;
+		};
+		8AE656381D64A2BE0000003F /* UmbrellaDecision.swift in app */ = {
+			isa = PBXBuildFile;
+			fileRef = B087D46F065DA13E0000000C;
+		};
+		96F1FA0A8AC805CC0000003D /* SnapshotFallback.swift in app */ = {
+			isa = PBXBuildFile;
+			fileRef = E2AA65588BDD88B00000000A;
+		};
+		99959E9BC0881EED00000041 /* UmbrellaSnapshot.swift in app */ = {
+			isa = PBXBuildFile;
+			fileRef = A8F287252ECEC9F90000000E;
+		};
+		A1F5FD7E77453B1600000069 /* UmbrellaSnapshot.swift in tests */ = {
+			isa = PBXBuildFile;
+			fileRef = A8F287252ECEC9F90000000E;
+		};
+		A2FC883665B5AAEA00000060 /* UmbrellaDecisionTests.swift in tests */ = {
+			isa = PBXBuildFile;
+			fileRef = C238C8DAA5ABACDF00000029;
+		};
+		A5AE25D864AF957F00000034 /* NotificationScheduler.swift in app */ = {
+			isa = PBXBuildFile;
+			fileRef = 6722F234AF7939E500000015;
+		};
+		A5FD8C30B135901900000055 /* UmbrellaSnapshot.swift in widget */ = {
+			isa = PBXBuildFile;
+			fileRef = A8F287252ECEC9F90000000E;
+		};
+		AEF43948A911A6C500000052 /* TimelinePlanner.swift in widget */ = {
+			isa = PBXBuildFile;
+			fileRef = 8AE18A53ADCF7CB70000000B;
+		};
+		B3D830D2DFCB39580000004B /* UmbrellaWidgetView.swift in widget */ = {
+			isa = PBXBuildFile;
+			fileRef = 43E443BCA70A18B500000020;
+		};
+		B710495578D6BDBF00000067 /* TimelinePlanner.swift in tests */ = {
+			isa = PBXBuildFile;
+			fileRef = 8AE18A53ADCF7CB70000000B;
+		};
+		BD52237C6288E75A0000004C /* AppConstants.swift in widget */ = {
+			isa = PBXBuildFile;
+			fileRef = 0CEF26B39063AC1F00000005;
+		};
+		BE08D50FB86BDCB50000004E /* CalendarTime.swift in widget */ = {
+			isa = PBXBuildFile;
+			fileRef = 60F825C8BA397B0D00000007;
+		};
+		C16A86FE44CA9B3C00000031 /* AppModel.swift in app */ = {
+			isa = PBXBuildFile;
+			fileRef = 883BB3D15390337000000012;
+		};
+		C435337BC6E27C3200000053 /* UmbrellaDecision.swift in widget */ = {
+			isa = PBXBuildFile;
+			fileRef = B087D46F065DA13E0000000C;
+		};
+		C848FB3DD479E3A100000048 /* UmbrellaEntry.swift in widget */ = {
+			isa = PBXBuildFile;
+			fileRef = 2DE373401D4A39DE0000001D;
+		};
+		CD40715CF8D5B8450000003C /* SharedStore.swift in app */ = {
+			isa = PBXBuildFile;
+			fileRef = 3EF9F3E2791B733100000009;
+		};
+		CF9DFFA89C8CA6B000000065 /* SharedStore.swift in tests */ = {
+			isa = PBXBuildFile;
+			fileRef = 3EF9F3E2791B733100000009;
+		};
+		D15E3C1A24B8795500000049 /* UmbrellaProvider.swift in widget */ = {
+			isa = PBXBuildFile;
+			fileRef = 830B2B5DD60CFB9C0000001E;
+		};
+		D4390272C9ABF49900000059 /* Assets.xcassets in widget */ = {
+			isa = PBXBuildFile;
+			fileRef = DD40FC2B67464C8700000021;
+		};
+		D7AE9722BB8CDE800000003B /* LocationProvider.swift in app */ = {
+			isa = PBXBuildFile;
+			fileRef = 7373C0F23FD0791500000008;
+		};
+		D7FD590E58033C6A00000035 /* OnboardingView.swift in app */ = {
+			isa = PBXBuildFile;
+			fileRef = 12278CEDC54D8E6700000016;
+		};
+		D9E3A2646235B3720000005C /* ForecastFixtures.swift in tests */ = {
+			isa = PBXBuildFile;
+			fileRef = 1A92BBA4EA8617B300000025;
+		};
+		E0CBBADDA37F076100000054 /* UmbrellaRefresher.swift in widget */ = {
+			isa = PBXBuildFile;
+			fileRef = E44EA6C0B9793F280000000D;
+		};
+		E3B224D7B8B07BC30000005F /* TimelinePlannerTests.swift in tests */ = {
+			isa = PBXBuildFile;
+			fileRef = 76CC095BEE2381C000000028;
+		};
+		E3D35DF0457BB1BA00000063 /* BackgroundRefreshPlanner.swift in tests */ = {
+			isa = PBXBuildFile;
+			fileRef = B539CBD8FBB84FFA00000006;
+		};
+		F2B000410BF40E5700000038 /* AppConstants.swift in app */ = {
+			isa = PBXBuildFile;
+			fileRef = 0CEF26B39063AC1F00000005;
+		};
+		F2D2D3A9E492A87500000061 /* WeatherServiceTests.swift in tests */ = {
+			isa = PBXBuildFile;
+			fileRef = 520362BC6E60B4DB0000002A;
+		};
+		F7DD5F515D89C4BD00000056 /* WeatherModels.swift in widget */ = {
+			isa = PBXBuildFile;
+			fileRef = 32DFA86716CA43CD0000000F;
+		};
+		F8150EA04662C1AD0000004D /* BackgroundRefreshPlanner.swift in widget */ = {
+			isa = PBXBuildFile;
+			fileRef = B539CBD8FBB84FFA00000006;
+		};
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		99E6A51DA0B86FE40000007D = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 46F86FAA6BBF9AC90000007C;
+			proxyType = 1;
+			remoteGlobalIDString = 0661F517A86C8F5C0000007E;
+			remoteInfo = UmbrellaWidgetExtension;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		496AF46EC2762DDF0000006F /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				41AA415A4EEBCAF40000006E /* UmbrellaWidgetExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		03B82D11BBCB2D6E00000023 /* UmbrellaWidget.entitlements */ = {
+			isa = PBXFileReference;
+			lastKnownFileType = text.plist.entitlements;
+			path = UmbrellaWidget.entitlements;
+			sourceTree = "<group>";
+		};
+		0A6E5850A5E896E500000014 /* HomeView.swift */ = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			path = HomeView.swift;
+			sourceTree = "<group>";
+		};
+		0CEF26B39063AC1F00000005 /* AppConstants.swift */ = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			path = AppConstants.swift;
+			sourceTree = "<group>";
+		};
+		12278CEDC54D8E6700000016 /* OnboardingView.swift */ = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			path = OnboardingView.swift;
+			sourceTree = "<group>";
+		};
+		1A92BBA4EA8617B300000025 /* ForecastFixtures.swift */ = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			path = ForecastFixtures.swift;
+			sourceTree = "<group>";
+		};
+		1B442E42980596EB00000002 /* UmbrellaWidgetExtension.appex */ = {
+			isa = PBXFileReference;
+			explicitFileType = "wrapper.app-extension";
+			includeInIndex = 0;
+			path = UmbrellaWidgetExtension.appex;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		210C1A1C55212E7500000022 /* Info.plist */ = {
+			isa = PBXFileReference;
+			lastKnownFileType = text.plist.xml;
+			path = Info.plist;
+			sourceTree = "<group>";
+		};
+		25CD7A3B0389EDCC00000017 /* SettingsView.swift */ = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			path = SettingsView.swift;
+			sourceTree = "<group>";
+		};
+		2DE373401D4A39DE0000001D /* UmbrellaEntry.swift */ = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			path = UmbrellaEntry.swift;
+			sourceTree = "<group>";
+		};
+		32DFA86716CA43CD0000000F /* WeatherModels.swift */ = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			path = WeatherModels.swift;
+			sourceTree = "<group>";
+		};
+		3EF9F3E2791B733100000009 /* SharedStore.swift */ = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			path = SharedStore.swift;
+			sourceTree = "<group>";
+		};
+		42A130CB5AA89FBC0000001A /* Info.plist */ = {
+			isa = PBXFileReference;
+			lastKnownFileType = text.plist.xml;
+			path = Info.plist;
+			sourceTree = "<group>";
+		};
+		43E443BCA70A18B500000020 /* UmbrellaWidgetView.swift */ = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			path = UmbrellaWidgetView.swift;
+			sourceTree = "<group>";
+		};
+		520362BC6E60B4DB0000002A /* WeatherServiceTests.swift */ = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			path = WeatherServiceTests.swift;
+			sourceTree = "<group>";
+		};
+		55B14CDA731D7DBA0000001B /* UmbrellaApp.entitlements */ = {
+			isa = PBXFileReference;
+			lastKnownFileType = text.plist.entitlements;
+			path = UmbrellaApp.entitlements;
+			sourceTree = "<group>";
+		};
+		60F825C8BA397B0D00000007 /* CalendarTime.swift */ = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			path = CalendarTime.swift;
+			sourceTree = "<group>";
+		};
+		6722F234AF7939E500000015 /* NotificationScheduler.swift */ = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			path = NotificationScheduler.swift;
+			sourceTree = "<group>";
+		};
+		68ABFA29DE2B785B0000001F /* UmbrellaWidgetBundle.swift */ = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			path = UmbrellaWidgetBundle.swift;
+			sourceTree = "<group>";
+		};
+		7373C0F23FD0791500000008 /* LocationProvider.swift */ = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			path = LocationProvider.swift;
+			sourceTree = "<group>";
+		};
+		76CC095BEE2381C000000028 /* TimelinePlannerTests.swift */ = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			path = TimelinePlannerTests.swift;
+			sourceTree = "<group>";
+		};
+		819AFA168B2033ED00000018 /* UmbrellaAppApp.swift */ = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			path = UmbrellaAppApp.swift;
+			sourceTree = "<group>";
+		};
+		830B2B5DD60CFB9C0000001E /* UmbrellaProvider.swift */ = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			path = UmbrellaProvider.swift;
+			sourceTree = "<group>";
+		};
+		84337AD8D27FCD6900000001 /* UmbrellaApp.app */ = {
+			isa = PBXFileReference;
+			explicitFileType = wrapper.application;
+			includeInIndex = 0;
+			path = UmbrellaApp.app;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		8509DD790DE7D4A40000002C /* README.md */ = {
+			isa = PBXFileReference;
+			lastKnownFileType = net.daringfireball.markdown;
+			path = README.md;
+			sourceTree = "<group>";
+		};
+		883BB3D15390337000000012 /* AppModel.swift */ = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			path = AppModel.swift;
+			sourceTree = "<group>";
+		};
+		8AE18A53ADCF7CB70000000B /* TimelinePlanner.swift */ = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			path = TimelinePlanner.swift;
+			sourceTree = "<group>";
+		};
+		8EF59F8123A0041B0000002D /* project.yml */ = {
+			isa = PBXFileReference;
+			lastKnownFileType = text.yaml;
+			path = project.yml;
+			sourceTree = "<group>";
+		};
+		97DE1B35E8B5C88F00000026 /* SchedulingAndDisplayTests.swift */ = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			path = SchedulingAndDisplayTests.swift;
+			sourceTree = "<group>";
+		};
+		A8F287252ECEC9F90000000E /* UmbrellaSnapshot.swift */ = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			path = UmbrellaSnapshot.swift;
+			sourceTree = "<group>";
+		};
+		B087D46F065DA13E0000000C /* UmbrellaDecision.swift */ = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			path = UmbrellaDecision.swift;
+			sourceTree = "<group>";
+		};
+		B539CBD8FBB84FFA00000006 /* BackgroundRefreshPlanner.swift */ = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			path = BackgroundRefreshPlanner.swift;
+			sourceTree = "<group>";
+		};
+		C238C8DAA5ABACDF00000029 /* UmbrellaDecisionTests.swift */ = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			path = UmbrellaDecisionTests.swift;
+			sourceTree = "<group>";
+		};
+		CEFC84C9451816CC00000019 /* Assets.xcassets */ = {
+			isa = PBXFileReference;
+			lastKnownFileType = folder.assetcatalog;
+			path = Assets.xcassets;
+			sourceTree = "<group>";
+		};
+		D627553E66F78FAD00000010 /* WeatherService.swift */ = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			path = WeatherService.swift;
+			sourceTree = "<group>";
+		};
+		DD40FC2B67464C8700000021 /* Assets.xcassets */ = {
+			isa = PBXFileReference;
+			lastKnownFileType = folder.assetcatalog;
+			path = Assets.xcassets;
+			sourceTree = "<group>";
+		};
+		DFDED23FA58339F900000003 /* UmbrellaTests.xctest */ = {
+			isa = PBXFileReference;
+			explicitFileType = wrapper.cfbundle;
+			includeInIndex = 0;
+			path = UmbrellaTests.xctest;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		E28CD06705020E9800000027 /* SharedStoreTests.swift */ = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			path = SharedStoreTests.swift;
+			sourceTree = "<group>";
+		};
+		E2AA65588BDD88B00000000A /* SnapshotFallback.swift */ = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			path = SnapshotFallback.swift;
+			sourceTree = "<group>";
+		};
+		E44EA6C0B9793F280000000D /* UmbrellaRefresher.swift */ = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			path = UmbrellaRefresher.swift;
+			sourceTree = "<group>";
+		};
+		F706898422D3C06200000013 /* BackgroundRefreshScheduler.swift */ = {
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.swift;
+			path = BackgroundRefreshScheduler.swift;
+			sourceTree = "<group>";
+		};
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		11EF39465FB5B37C0000005A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		35F1006C97E0D4850000006C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6EFAB1ECC0D092E200000046 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		15391B22E9734DC900000011 /* UmbrellaApp */ = {
+			isa = PBXGroup;
+			children = (
+				883BB3D15390337000000012 /* AppModel.swift */,
+				F706898422D3C06200000013 /* BackgroundRefreshScheduler.swift */,
+				0A6E5850A5E896E500000014 /* HomeView.swift */,
+				6722F234AF7939E500000015 /* NotificationScheduler.swift */,
+				12278CEDC54D8E6700000016 /* OnboardingView.swift */,
+				25CD7A3B0389EDCC00000017 /* SettingsView.swift */,
+				819AFA168B2033ED00000018 /* UmbrellaAppApp.swift */,
+				CEFC84C9451816CC00000019 /* Assets.xcassets */,
+				42A130CB5AA89FBC0000001A /* Info.plist */,
+				55B14CDA731D7DBA0000001B /* UmbrellaApp.entitlements */,
+			);
+			path = UmbrellaApp;
+			sourceTree = "<group>";
+		};
+		2F3A6B1E78F896710000002E /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				84337AD8D27FCD6900000001 /* UmbrellaApp.app */,
+				1B442E42980596EB00000002 /* UmbrellaWidgetExtension.appex */,
+				DFDED23FA58339F900000003 /* UmbrellaTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		37AE5EA0D722F3B70000002B /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				8509DD790DE7D4A40000002C /* README.md */,
+				8EF59F8123A0041B0000002D /* project.yml */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		518DA81DB9B995290000002F = {
+			isa = PBXGroup;
+			children = (
+				15391B22E9734DC900000011 /* UmbrellaApp */,
+				7BBA1A69460D9C810000001C /* UmbrellaWidget */,
+				B46A6AFB1DC88CE200000004 /* Shared */,
+				7FA3878D5A2CD94D00000024 /* UmbrellaTests */,
+				37AE5EA0D722F3B70000002B /* Supporting Files */,
+				2F3A6B1E78F896710000002E /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		7BBA1A69460D9C810000001C /* UmbrellaWidget */ = {
+			isa = PBXGroup;
+			children = (
+				2DE373401D4A39DE0000001D /* UmbrellaEntry.swift */,
+				830B2B5DD60CFB9C0000001E /* UmbrellaProvider.swift */,
+				68ABFA29DE2B785B0000001F /* UmbrellaWidgetBundle.swift */,
+				43E443BCA70A18B500000020 /* UmbrellaWidgetView.swift */,
+				DD40FC2B67464C8700000021 /* Assets.xcassets */,
+				210C1A1C55212E7500000022 /* Info.plist */,
+				03B82D11BBCB2D6E00000023 /* UmbrellaWidget.entitlements */,
+			);
+			path = UmbrellaWidget;
+			sourceTree = "<group>";
+		};
+		7FA3878D5A2CD94D00000024 /* UmbrellaTests */ = {
+			isa = PBXGroup;
+			children = (
+				1A92BBA4EA8617B300000025 /* ForecastFixtures.swift */,
+				97DE1B35E8B5C88F00000026 /* SchedulingAndDisplayTests.swift */,
+				E28CD06705020E9800000027 /* SharedStoreTests.swift */,
+				76CC095BEE2381C000000028 /* TimelinePlannerTests.swift */,
+				C238C8DAA5ABACDF00000029 /* UmbrellaDecisionTests.swift */,
+				520362BC6E60B4DB0000002A /* WeatherServiceTests.swift */,
+			);
+			path = UmbrellaTests;
+			sourceTree = "<group>";
+		};
+		B46A6AFB1DC88CE200000004 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				0CEF26B39063AC1F00000005 /* AppConstants.swift */,
+				B539CBD8FBB84FFA00000006 /* BackgroundRefreshPlanner.swift */,
+				60F825C8BA397B0D00000007 /* CalendarTime.swift */,
+				7373C0F23FD0791500000008 /* LocationProvider.swift */,
+				3EF9F3E2791B733100000009 /* SharedStore.swift */,
+				E2AA65588BDD88B00000000A /* SnapshotFallback.swift */,
+				8AE18A53ADCF7CB70000000B /* TimelinePlanner.swift */,
+				B087D46F065DA13E0000000C /* UmbrellaDecision.swift */,
+				E44EA6C0B9793F280000000D /* UmbrellaRefresher.swift */,
+				A8F287252ECEC9F90000000E /* UmbrellaSnapshot.swift */,
+				32DFA86716CA43CD0000000F /* WeatherModels.swift */,
+				D627553E66F78FAD00000010 /* WeatherService.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		0661F517A86C8F5C0000007E /* UmbrellaWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8EB251B5FEF9F9B900000078;
+			buildPhases = (
+				37A859133C5B7A4900000047 /* Sources */,
+				11EF39465FB5B37C0000005A /* Frameworks */,
+				B56E96530BC9DC2E00000058 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = UmbrellaWidgetExtension;
+			productName = UmbrellaWidgetExtension;
+			productReference = 1B442E42980596EB00000002;
+			productType = "com.apple.product-type.app-extension";
+		};
+		A700229C3AC2DAE000000081 /* UmbrellaTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9B28569972ABC6040000007B;
+			buildPhases = (
+				D3B6D4B6799995BE0000005B /* Sources */,
+				35F1006C97E0D4850000006C /* Frameworks */,
+				6D500EBBE8103AB10000006D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = UmbrellaTests;
+			productName = UmbrellaTests;
+			productReference = DFDED23FA58339F900000003;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		E3435DDA2687639500000080 /* UmbrellaApp */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5505F9AF814A7F0900000075;
+			buildPhases = (
+				4821909E9BF9E73E00000030 /* Sources */,
+				6EFAB1ECC0D092E200000046 /* Frameworks */,
+				F667297ED3AB90EA00000044 /* Resources */,
+				496AF46EC2762DDF0000006F /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				51706C2E79528CC90000007F,
+			);
+			name = UmbrellaApp;
+			productName = UmbrellaApp;
+			productReference = 84337AD8D27FCD6900000001;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		46F86FAA6BBF9AC90000007C /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1520;
+				LastUpgradeCheck = 1520;
+				TargetAttributes = {
+					E3435DDA2687639500000080 /* UmbrellaApp */ = {
+						CreatedOnToolsVersion = 15.2;
+					};
+					0661F517A86C8F5C0000007E /* UmbrellaWidgetExtension */ = {
+						CreatedOnToolsVersion = 15.2;
+					};
+					A700229C3AC2DAE000000081 /* UmbrellaTests */ = {
+						CreatedOnToolsVersion = 15.2;
+					};
+				};
+			};
+			buildConfigurationList = 7EF2517A8FE63F4600000072;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+				ko,
+			);
+			mainGroup = 518DA81DB9B995290000002F;
+			productRefGroup = 2F3A6B1E78F896710000002E;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				E3435DDA2687639500000080 /* UmbrellaApp */,
+				0661F517A86C8F5C0000007E /* UmbrellaWidgetExtension */,
+				A700229C3AC2DAE000000081 /* UmbrellaTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		6D500EBBE8103AB10000006D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B56E96530BC9DC2E00000058 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D4390272C9ABF49900000059 /* Assets.xcassets in widget */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F667297ED3AB90EA00000044 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6B40B3C00E4ECB6300000045 /* Assets.xcassets in app */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		37A859133C5B7A4900000047 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C848FB3DD479E3A100000048 /* UmbrellaEntry.swift in widget */,
+				D15E3C1A24B8795500000049 /* UmbrellaProvider.swift in widget */,
+				4AA7C975F71FA3FB0000004A /* UmbrellaWidgetBundle.swift in widget */,
+				B3D830D2DFCB39580000004B /* UmbrellaWidgetView.swift in widget */,
+				BD52237C6288E75A0000004C /* AppConstants.swift in widget */,
+				F8150EA04662C1AD0000004D /* BackgroundRefreshPlanner.swift in widget */,
+				BE08D50FB86BDCB50000004E /* CalendarTime.swift in widget */,
+				1FD6DC3B1592CAF80000004F /* LocationProvider.swift in widget */,
+				254BC51E6FAB83CD00000050 /* SharedStore.swift in widget */,
+				7FD12B0FF635E1C000000051 /* SnapshotFallback.swift in widget */,
+				AEF43948A911A6C500000052 /* TimelinePlanner.swift in widget */,
+				C435337BC6E27C3200000053 /* UmbrellaDecision.swift in widget */,
+				E0CBBADDA37F076100000054 /* UmbrellaRefresher.swift in widget */,
+				A5FD8C30B135901900000055 /* UmbrellaSnapshot.swift in widget */,
+				F7DD5F515D89C4BD00000056 /* WeatherModels.swift in widget */,
+				8773F260CAF50A0C00000057 /* WeatherService.swift in widget */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4821909E9BF9E73E00000030 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C16A86FE44CA9B3C00000031 /* AppModel.swift in app */,
+				257402B5136FEAEF00000032 /* BackgroundRefreshScheduler.swift in app */,
+				3F3ECAF1C0CDF6A100000033 /* HomeView.swift in app */,
+				A5AE25D864AF957F00000034 /* NotificationScheduler.swift in app */,
+				D7FD590E58033C6A00000035 /* OnboardingView.swift in app */,
+				072A93785755752800000036 /* SettingsView.swift in app */,
+				88601FA415D575B400000037 /* UmbrellaAppApp.swift in app */,
+				F2B000410BF40E5700000038 /* AppConstants.swift in app */,
+				497A337DE6FCB97700000039 /* BackgroundRefreshPlanner.swift in app */,
+				0F1EC586E9FD7BA80000003A /* CalendarTime.swift in app */,
+				D7AE9722BB8CDE800000003B /* LocationProvider.swift in app */,
+				CD40715CF8D5B8450000003C /* SharedStore.swift in app */,
+				96F1FA0A8AC805CC0000003D /* SnapshotFallback.swift in app */,
+				886D88C51C6B47920000003E /* TimelinePlanner.swift in app */,
+				8AE656381D64A2BE0000003F /* UmbrellaDecision.swift in app */,
+				22ABC4CC6E8B482F00000040 /* UmbrellaRefresher.swift in app */,
+				99959E9BC0881EED00000041 /* UmbrellaSnapshot.swift in app */,
+				2E51B17E012651A100000042 /* WeatherModels.swift in app */,
+				048B18E544A0101700000043 /* WeatherService.swift in app */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D3B6D4B6799995BE0000005B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D9E3A2646235B3720000005C /* ForecastFixtures.swift in tests */,
+				127D2B6ACDE184070000005D /* SchedulingAndDisplayTests.swift in tests */,
+				2C5E47C656CD109D0000005E /* SharedStoreTests.swift in tests */,
+				E3B224D7B8B07BC30000005F /* TimelinePlannerTests.swift in tests */,
+				A2FC883665B5AAEA00000060 /* UmbrellaDecisionTests.swift in tests */,
+				F2D2D3A9E492A87500000061 /* WeatherServiceTests.swift in tests */,
+				184F20157D9FF3C800000062 /* AppConstants.swift in tests */,
+				E3D35DF0457BB1BA00000063 /* BackgroundRefreshPlanner.swift in tests */,
+				820832BCBA5426BD00000064 /* CalendarTime.swift in tests */,
+				CF9DFFA89C8CA6B000000065 /* SharedStore.swift in tests */,
+				64516E8224D9D7A800000066 /* SnapshotFallback.swift in tests */,
+				B710495578D6BDBF00000067 /* TimelinePlanner.swift in tests */,
+				3B56CA179B3D212C00000068 /* UmbrellaDecision.swift in tests */,
+				A1F5FD7E77453B1600000069 /* UmbrellaSnapshot.swift in tests */,
+				13C40692BC2F06C70000006A /* WeatherModels.swift in tests */,
+				59A651E85DFACB110000006B /* WeatherService.swift in tests */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		51706C2E79528CC90000007F = {
+			isa = PBXTargetDependency;
+			target = 0661F517A86C8F5C0000007E;
+			targetProxy = 99E6A51DA0B86FE40000007D;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		58F04E6CEF79D04D00000079 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.umbrella.tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		88A29AB70C762FCD00000071 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		8BEF7D6F48ABC8DA0000007A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.umbrella.tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		91B8F6FB95707A0A00000073 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = UmbrellaApp/UmbrellaApp.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = UmbrellaApp/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.umbrella;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		A6CB7D0C1CF106E200000077 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = UmbrellaWidget/UmbrellaWidget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = UmbrellaWidget/Info.plist;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.umbrella.widget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		B42163DECE77CBD000000076 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = UmbrellaWidget/UmbrellaWidget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = UmbrellaWidget/Info.plist;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.umbrella.widget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		BB071F776B40F48300000074 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = UmbrellaApp/UmbrellaApp.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = UmbrellaApp/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.umbrella;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		C19BB360D63F1BA900000070 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_TESTABILITY = YES;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				ONLY_ACTIVE_ARCH = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		5505F9AF814A7F0900000075 = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				91B8F6FB95707A0A00000073 /* Debug */,
+				BB071F776B40F48300000074 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		7EF2517A8FE63F4600000072 = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C19BB360D63F1BA900000070 /* Debug */,
+				88A29AB70C762FCD00000071 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		8EB251B5FEF9F9B900000078 = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B42163DECE77CBD000000076 /* Debug */,
+				A6CB7D0C1CF106E200000077 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		9B28569972ABC6040000007B = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				58F04E6CEF79D04D00000079 /* Debug */,
+				8BEF7D6F48ABC8DA0000007A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 46F86FAA6BBF9AC90000007C /* Project object */;
+}

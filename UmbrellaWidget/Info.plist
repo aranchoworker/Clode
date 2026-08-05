@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- Lets the widget extension receive location updates from CoreLocation.
+	     Without this key `isAuthorizedForWidgetUpdates` is always false and the
+	     widget can only ever use the coordinate cached by the app. -->
+	<key>NSWidgetWantsLocation</key>
+	<true/>
+
+	<!-- The widget never asks for authorisation itself; it inherits the
+	     when-in-use grant the container app obtained. The usage string is
+	     repeated here because iOS reads it from whichever bundle is asking. -->
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>위젯에 현재 위치의 오늘 강수확률을 표시하기 위해 위치를 사용합니다.</string>
+
+	<key>NSExtension</key>
+	<dict>
+		<key>NSExtensionPointIdentifier</key>
+		<string>com.apple.widgetkit-extension</string>
+	</dict>
+</dict>
+</plist>

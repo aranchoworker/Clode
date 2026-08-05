@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- Location: when-in-use only. "Always" authorisation is deliberately not
+	     requested — the widget gets its own grant via NSWidgetWantsLocation in
+	     the extension's Info.plist. -->
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>현재 위치의 오늘 강수확률을 조회해 우산이 필요한지 알려드리기 위해 위치를 사용합니다.</string>
+
+	<!-- Lets the container app receive location on behalf of its widget. -->
+	<key>NSWidgetWantsLocation</key>
+	<true/>
+
+	<!-- Early-morning refresh so the widget and the reminder are ready before
+	     the user wakes up. Must match AppConstants.backgroundRefreshTaskIdentifier. -->
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>com.example.umbrella.refresh</string>
+	</array>
+
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+	</array>
+
+	<!-- Deep link opened when the widget is tapped.
+	     Must match AppConstants.urlScheme. -->
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>com.example.umbrella.deeplink</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>umbrella</string>
+			</array>
+		</dict>
+	</array>
+
+	<key>UILaunchScreen</key>
+	<dict/>
+
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+</dict>
+</plist>
