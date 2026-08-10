@@ -1,0 +1,37 @@
+{
+  "expo": {
+    "name": "VoiceAlarm",
+    "slug": "voicealarm",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "scheme": "voicealarm",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.voicealarm.app",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "package": "com.voicealarm.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#0E1013",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false,
+      "edgeToEdgeEnabled": true
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": ["expo-dev-client", "expo-secure-store", "expo-localization"],
+    "extra": {
+      "apiBaseUrl": ""
+    }
+  }
+}

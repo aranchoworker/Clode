@@ -1,0 +1,86 @@
+/**
+ * 한국어가 기준(source of truth)이다.
+ * 다른 언어 파일은 `Record<TranslationKey, string>` 으로 선언돼 있어서,
+ * 여기에 키를 추가하면 번역이 빠진 언어 파일이 컴파일 에러로 잡힌다.
+ */
+export const ko = {
+  'common.cancel': '취소',
+  'common.confirm': '확인',
+  'common.retry': '다시 시도',
+  'common.loading': '불러오는 중…',
+  'common.error.network': '네트워크에 연결할 수 없습니다. 연결을 확인해 주세요.',
+  'common.error.unknown': '알 수 없는 오류가 발생했습니다.',
+
+  'auth.login.title': '로그인',
+  'auth.login.submit': '로그인',
+  'auth.login.toSignup': '계정이 없으신가요? 가입하기',
+  'auth.signup.title': '회원가입',
+  'auth.signup.submit': '가입하기',
+  'auth.signup.toLogin': '이미 계정이 있으신가요? 로그인',
+  'auth.field.userId': '아이디',
+  'auth.field.userId.hint': '영문·숫자 3~20자',
+  'auth.field.password': '비밀번호',
+  'auth.field.password.hint': '8자 이상',
+  'auth.field.displayName': '표시 이름',
+  'auth.field.displayName.hint': '친구에게 보이는 이름',
+  'auth.error.invalidCredentials': '아이디 또는 비밀번호가 올바르지 않습니다.',
+  'auth.error.userIdTaken': '이미 사용 중인 아이디입니다.',
+  'auth.error.tooManyAttempts': '로그인 시도가 너무 많습니다. 잠시 후 다시 시도해 주세요.',
+  'auth.error.validation': '입력한 값을 다시 확인해 주세요.',
+
+  'tab.home': '알람',
+  'tab.friends': '친구',
+  'tab.settings': '설정',
+
+  'home.title': '알람',
+  'home.tab.received': '받을 알람',
+  'home.tab.sent': '보낸 알람',
+  'home.empty': '예정된 알람이 없습니다.',
+  'home.comingSoon': '알람 보내기는 다음 단계에서 추가됩니다.',
+
+  'friends.title': '친구',
+  'friends.tab.friends': '친구',
+  'friends.tab.incoming': '받은 요청',
+  'friends.tab.outgoing': '보낸 요청',
+  'friends.empty': '아직 친구가 없습니다. 아이디로 친구를 찾아보세요.',
+  'friends.empty.incoming': '받은 친구 요청이 없습니다.',
+  'friends.empty.outgoing': '보낸 친구 요청이 없습니다.',
+  'friends.add': '친구 추가',
+  'friends.accept': '수락',
+  'friends.reject': '거절',
+  'friends.cancelRequest': '요청 취소',
+  'friends.remove': '친구 삭제',
+  'friends.remove.confirm': '{name} 님을 친구에서 삭제할까요? 예약된 알람도 함께 취소됩니다.',
+  'friends.block': '차단',
+  'friends.block.confirm':
+    '{name} 님을 차단할까요? 이미 예약된 알람도 울리지 않고, 서로 알람을 보낼 수 없게 됩니다.',
+  'friends.blocked.done': '{name} 님을 차단했습니다.',
+  'friends.blocked.alarmsCancelled': '예약돼 있던 알람 {count}개가 취소되었습니다.',
+
+  'search.title': '친구 추가',
+  'search.placeholder': '친구의 아이디를 정확히 입력하세요',
+  'search.submit': '검색',
+  'search.hint': '아이디가 정확히 일치해야 검색됩니다.',
+  'search.notFound': '해당 아이디의 사용자를 찾을 수 없습니다.',
+  'search.self': '본인의 아이디입니다.',
+  'search.sendRequest': '친구 요청',
+  'search.requestSent': '친구 요청을 보냈습니다.',
+  'search.status.pending.outgoing': '요청을 보낸 상태입니다.',
+  'search.status.pending.incoming': '받은 요청이 있습니다. 친구 탭에서 수락해 주세요.',
+  'search.status.accepted': '이미 친구입니다.',
+
+  'settings.title': '설정',
+  'settings.account': '계정',
+  'settings.blocks': '차단 목록',
+  'settings.permissions': '알람 권한',
+  'settings.permissions.pending': '알람 기능은 다음 단계에서 설정합니다.',
+  'settings.logout': '로그아웃',
+  'settings.logout.confirm': '로그아웃할까요?',
+
+  'blocks.title': '차단 목록',
+  'blocks.empty': '차단한 사용자가 없습니다.',
+  'blocks.unblock': '차단 해제',
+  'blocks.unblock.confirm': '{name} 님의 차단을 해제할까요?',
+} as const;
+
+export type TranslationKey = keyof typeof ko;

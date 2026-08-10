@@ -6,7 +6,7 @@
 - 지정한 시각에 수신자 기기에서 로컬 알람이 울리고, 발신자의 녹음이 재생된다
 - 수신자가 차단하면 **이미 예약된 알람도 울리지 않는다**
 
-현재 상태: **Phase 1 (백엔드 기초) 완료.** 아래 [개발 진행 상황](#개발-진행-상황) 참고.
+현재 상태: **Phase 2 (앱 기초) 완료.** 아래 [개발 진행 상황](#개발-진행-상황) 참고.
 
 ---
 
@@ -15,6 +15,19 @@
 앱을 만들기 전에 반드시 알아야 하는 플랫폼 제약이 있습니다.
 → [플랫폼 한계](#플랫폼-한계-반드시-읽을-것) 섹션을 먼저 보세요. 특히 **iOS는 서드파티 앱이
 진짜 알람 시계를 만들 수 없습니다.**
+
+## 프로젝트 방침: 별도 승인이 필요한 기능은 쓰지 않는다
+
+Apple/Google에 **별도 신청·심사 소명이 필요한 권한은 사용하지 않습니다.** 그래서:
+
+| 안 쓰는 것 | 왜 | 대신 |
+|---|---|---|
+| iOS Critical Alerts 엔타이틀먼트 | Apple에 별도 신청·승인 필요, 승인 보장 없음 | Time Sensitive 인터럽션 레벨 + 커스텀 사운드 |
+| Android `USE_EXACT_ALARM` | Play 스토어 심사에서 "알람 시계 앱" 소명 필요 | `SCHEDULE_EXACT_ALARM` — 사용자가 온보딩에서 직접 허용 |
+
+**받아들이는 대가:** 수신자가 **무음/방해금지 모드면 iOS에서는 알람이 울리지 않습니다.**
+Android는 `STREAM_ALARM` 재생이라 무음 모드에서도 울립니다(이건 권한 문제가 아니라
+오디오 스트림 선택 문제라 승인과 무관). 이 차이를 앱 온보딩에서 안내합니다.
 
 ---
 
@@ -64,8 +77,8 @@
 | 항목 | 내용 |
 |---|---|
 | 정확한 알람 | `AlarmManager.setAlarmClock()` 또는 `setExactAndAllowWhileIdle()` 로 Doze 우회 |
-| 권한 | Android 12+ 는 `SCHEDULE_EXACT_ALARM` 필요. 알람 시계 앱은 `USE_EXACT_ALARM` 으로 자동 부여 가능하나 **Play 스토어 심사에서 용도 소명 필요** |
-| 발화 화면 | Full-screen intent + Foreground Service. Android 14+ 는 `USE_FULL_SCREEN_INTENT` 권한이 알람/통화 앱에만 자동 부여 |
+| 권한 | Android 12+ 는 `SCHEDULE_EXACT_ALARM` 필요. **사용자가 설정에서 직접 허용**해야 하므로 온보딩 안내가 필수 (`USE_EXACT_ALARM` 은 Play 심사 소명이 필요해서 쓰지 않음) |
+| 발화 화면 | Full-screen intent + Foreground Service. Android 14+ 는 `USE_FULL_SCREEN_INTENT` 가 알람/통화 앱 외에는 자동 부여되지 않으므로, `ACTION_MANAGE_APP_USE_FULL_SCREEN_INTENT` 설정 화면으로 사용자를 보낸다 |
 | 무음 모드 | `AudioManager.STREAM_ALARM` 으로 재생하면 무음/진동 모드에서도 울림 |
 | 재부팅 | 등록된 알람이 전부 사라짐 → `BOOT_COMPLETED` 리시버로 재등록 필수 |
 | 배터리 최적화 | `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS` 안내 필요 |
@@ -81,13 +94,13 @@
 | 사운드 길이 | 커스텀 알림음 **최대 30초**. 초과분은 잘림 |
 | 사운드 포맷 | `caf` / `aiff` / `wav` (Linear PCM, MA4, µ-law, a-law). m4a/mp3 불가 |
 | 사운드 위치 | `Library/Sounds/` 에 **미리 다운로드**돼 있어야 `UNNotificationSound(named:)` 로 재생 가능 |
-| 무음 모드 | 기본적으로 **울리지 않습니다**. 뚫으려면 **Critical Alerts 엔타이틀먼트**가 필요하고, 이는 Apple에 별도 신청 후 승인받아야 합니다 (승인 보장 없음) |
-| 폴백 | 승인 전에는 `Time Sensitive` 인터럽션 레벨 + 커스텀 사운드 |
+| 무음 모드 | **울리지 않습니다.** 뚫으려면 Critical Alerts 엔타이틀먼트(Apple 승인)가 필요한데, [프로젝트 방침](#프로젝트-방침-별도-승인이-필요한-기능은-쓰지-않는다)상 쓰지 않습니다 |
+| 우리가 쓰는 것 | `Time Sensitive` 인터럽션 레벨 + 커스텀 사운드. 집중 모드는 뚫지만 무음 스위치는 못 뚫습니다 |
 | 30초 초과 녹음 | 알림을 **탭해서 앱을 열었을 때** 전체 재생하는 구조로 설계 |
 | 반복/스누즈 | 알림 재예약으로 흉내내야 하며, 앱당 대기 알림 **64개 제한** |
 
-**결론:** iOS에서는 "알람"이 아니라 "소리 나는 알림"입니다. 사용자가 방해금지 모드거나
-무음이면 놓칠 수 있습니다. 이 차이를 앱 온보딩에서 솔직히 안내하는 것을 권장합니다.
+**결론:** iOS에서는 "알람"이 아니라 "소리 나는 알림"입니다. 수신자가 무음 스위치를 켜 뒀거나
+방해금지 모드면 놓칠 수 있습니다. 앱 온보딩에서 이 점을 솔직히 안내합니다.
 
 ### 설계에 반영된 결과
 
@@ -101,7 +114,7 @@
 ## 개발 진행 상황
 
 - [x] **Phase 1 — 백엔드 기초**: DB 스키마 + 마이그레이션, 인증 API, 친구/차단 API, 단위 테스트
-- [ ] **Phase 2 — 앱 기초**: dev client 세팅, 로그인/회원가입, 친구 화면
+- [x] **Phase 2 — 앱 기초**: Expo dev client 세팅, 로그인/회원가입, 친구 검색·요청·수락·차단 화면
 - [ ] **Phase 3 — 녹음 & 업로드**: 녹음 UI, 30초 제한, presigned 업로드, caf 트랜스코딩
 - [ ] **Phase 4 — 알람 파이프라인**: 예약 API → 데이터 푸시 → 사전 다운로드 → 로컬 알람 → 발화 화면 → ack
 - [ ] **Phase 5 — 차단/취소 전파, 남용 방지, 신고**
@@ -128,6 +141,29 @@ voicealarm/server/
 │       ├── loginThrottle.ts     # 로그인 브루트포스 백오프
 │       └── push.ts              # 푸시 전송 경계 (Phase 4 에서 FCM 연결)
 └── tests/                       # 41개 테스트
+```
+
+### Phase 2 에서 만든 것
+
+```
+voicealarm/app/
+├── App.tsx                      # Provider 조립 (테마 → i18n → 인증 → 네비게이션)
+├── app.json                     # Expo 설정, dev client 플러그인, extra.apiBaseUrl
+├── src/
+│   ├── api/
+│   │   ├── client.ts            # ★ fetch 래퍼. 401 자동 재발급(single-flight)
+│   │   ├── endpoints.ts         # 경로·바디를 화면에서 숨기는 래퍼
+│   │   └── types.ts             # 서버 와이어 포맷(snake_case) 타입
+│   ├── auth/
+│   │   ├── AuthContext.tsx      # 세션 상태(loading/signedOut/signedIn), 복원
+│   │   ├── storage.ts           # SecureStore 토큰 저장 + 메모리 캐시
+│   │   └── memoryStore.ts       # 테스트용(네이티브 모듈 의존 없음)
+│   ├── components/index.tsx     # Screen, Button, TextField, UserRow, Badge …
+│   ├── i18n/                    # ko(기준) / en, 키 누락은 컴파일 에러
+│   ├── navigation/              # 인증 스택 / 메인 탭 + 스택
+│   ├── screens/                 # 로그인, 가입, 알람(껍데기), 친구, 친구추가, 차단, 설정
+│   └── theme/                   # 라이트·다크 팔레트
+└── tests/                       # 22개 (실서버 연동 3개 포함)
 ```
 
 ---
@@ -173,6 +209,63 @@ npm test
 ✓ tests/friends.test.ts         (9) — 요청/수락/거절/삭제, 정확 일치 검색
 ✓ tests/blocks.test.ts         (10) — 차단 전파, 예약 알람 취소, 차단 은닉
 ```
+
+---
+
+## 앱 실행 방법
+
+**Expo Go 로는 실행할 수 없습니다.** 알람·풀스크린 인텐트에 네이티브 모듈이 필요해서
+처음부터 dev client 로 세팅했습니다.
+
+```bash
+cd voicealarm/app
+npm install
+
+# 개발 빌드를 한 번 만든다 (이후에는 npm start 만으로 붙는다)
+npx expo run:android     # Android Studio + SDK 필요
+npx expo run:ios         # macOS + Xcode 필요
+
+npm start                # 이미 dev client 가 설치된 기기/에뮬레이터에 연결
+```
+
+### API 주소 설정
+
+기본값은 에뮬레이터 기준입니다(Android `10.0.2.2:3000`, iOS 시뮬레이터 `localhost:3000`).
+**실기기로 테스트하려면** `app.json` 의 `extra.apiBaseUrl` 을 개발 PC 의 LAN IP 로 바꾸세요.
+실기기는 PC 의 localhost 에 닿을 수 없습니다 — 실제로 가장 자주 막히는 지점입니다.
+
+```json
+"extra": { "apiBaseUrl": "http://192.168.0.10:3000" }
+```
+
+### 앱 테스트
+
+```bash
+cd voicealarm/app
+npm test          # 서버 없이 도는 단위 테스트
+npm run typecheck
+```
+
+```
+✓ tests/client.test.ts    (9) — 토큰 자동 재발급, 동시 요청 single-flight, 에러 변환
+✓ tests/i18n.test.ts      (6) — 키 일치, 자리표시자 일치
+✓ tests/errorMessage.test.ts (4) — 서버 코드 → 화면 언어 매핑
+✓ tests/integration.test.ts  (3) — 실제 서버 연동 (기본은 건너뜀)
+```
+
+**실서버 연동 테스트**는 목으로는 못 잡는 경로 오타·필드명 불일치를 잡습니다.
+서버를 띄운 뒤 주소를 넘기면 실행됩니다.
+
+```bash
+# 터미널 1
+cd voicealarm/server && npm run db:up && npm run dev
+# 터미널 2
+cd voicealarm/app && VOICEALARM_API_URL=http://localhost:3000 npm test
+```
+
+**자동 검증되지 않는 범위:** 화면 렌더링은 테스트하지 않습니다(jest-expo 프리셋이 필요).
+`npx expo export` 로 번들이 되는지는 확인했으므로 import·타입 오류는 걸러지지만,
+레이아웃과 실제 동작은 기기에서 확인해야 합니다.
 
 ### 환경변수
 
@@ -227,6 +320,19 @@ npm test
 | `DELETE` | `/blocks/:userId` | 차단 해제 |
 | `GET` | `/blocks` | 내가 차단한 목록 |
 
+### 앱 화면 (Phase 2 구현분)
+
+| 화면 | 내용 |
+|---|---|
+| 로그인 / 회원가입 | 아이디·비밀번호. 서버와 동일한 검증 규칙을 클라이언트에서도 적용(왕복 절약) |
+| 알람 (탭) | 받을 알람 / 보낸 알람 탭 구조만. 목록은 Phase 4 |
+| 친구 (탭) | 친구 / 받은 요청(뱃지) / 보낸 요청. 수락·거절·요청취소·친구삭제·차단 |
+| 친구 추가 | 아이디 정확 일치 검색 → 요청. 관계 상태에 따라 버튼이 사라짐 |
+| 설정 (탭) | 계정 정보, 차단 목록 진입, 로그아웃. 알람 권한은 Phase 6 |
+| 차단 목록 | 차단 해제 |
+
+다크 모드는 기기 설정을 따르고, 한국어/영어 i18n 구조가 잡혀 있습니다(기준은 한국어).
+
 ### Phase 4 에서 추가될 것
 
 `/voice-messages/upload-url`, `/voice-messages`, `POST /alarms`, `GET /alarms`,
@@ -266,23 +372,28 @@ npm test
 
 ## 내가(사용자가) 직접 해야 하는 일
 
-Phase 1 에서는 없습니다. 아래는 **Phase 4 시작 전까지** 준비가 필요한 항목입니다.
+### 지금 (Phase 2 확인용)
+- [ ] **Android**: Android Studio + SDK 설치 → `npx expo run:android`
+- [ ] **iOS**: macOS + Xcode 필요 → `npx expo run:ios` (Windows/Linux 에서는 불가)
+- [ ] 서버를 켜고(`npm run db:up && npm run dev`), 실기기라면 `app.json` 의
+      `extra.apiBaseUrl` 을 PC 의 LAN IP 로 변경
+- [ ] 두 계정으로 가입 → 아이디 검색 → 요청 → 수락 → 차단까지 눌러 보기
 
-### Android / FCM
+### Phase 4 시작 전까지
+**Android / FCM**
 - [ ] Firebase 프로젝트 생성
 - [ ] Android 앱 등록 → `google-services.json` 다운로드
 - [ ] 서버용 서비스 계정 키 발급 (FCM v1 API)
 
-### iOS / APNs
+**iOS / APNs**
 - [ ] Apple Developer Program 가입 (연 $99)
 - [ ] App ID 생성, Push Notifications capability 활성화
 - [ ] APNs 인증 키(.p8) 발급 → Firebase 콘솔에 업로드
-- [ ] **Critical Alerts 엔타이틀먼트 신청** — Apple 승인까지 시간이 걸리므로 **가장 먼저 신청**하세요.
-      (developer.apple.com → Contact us → Critical Alerts 요청)
 - [ ] 실기기 1대 이상 (시뮬레이터에서는 푸시·알람 테스트 불가)
 
+> Critical Alerts 신청은 **하지 않습니다**. [프로젝트 방침](#프로젝트-방침-별도-승인이-필요한-기능은-쓰지-않는다) 참고.
+
 ### 스토어 심사 대비
-- [ ] Android: `USE_EXACT_ALARM` 사용 사유 소명 (알람 시계 기능이 핵심임을 설명)
 - [ ] 개인정보처리방침 URL (음성 녹음을 다루므로 필수)
 - [ ] 이 앱은 괴롭힘 도구가 될 수 있으므로 **신고/차단 기능이 심사에서 확인**됩니다 (Phase 5)
 
