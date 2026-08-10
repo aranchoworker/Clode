@@ -22,6 +22,24 @@ const schema = z.object({
   LOGIN_LOCK_MAX_SEC: z.coerce.number().int().positive().default(60 * 60),
 
   CORS_ORIGIN: z.string().default('*'),
+
+  /// 클라이언트가 접근하는 서버 주소. 서명 URL 을 만들 때 쓰므로 실제 도달 가능한 값이어야 한다.
+  PUBLIC_BASE_URL: z.string().url().default('http://localhost:3000'),
+
+  STORAGE_DRIVER: z.enum(['local']).default('local'),
+  STORAGE_LOCAL_DIR: z.string().default('./.storage'),
+
+  /// 녹음 제한. 30초는 iOS 알림음 상한에서 온 값이라 늘릴 수 없다.
+  MAX_RECORDING_MS: z.coerce.number().int().positive().default(30_000),
+  /// 프레임 경계 때문에 실제 파일이 30초를 아주 살짝 넘을 수 있어 여유를 둔다.
+  RECORDING_DURATION_TOLERANCE_MS: z.coerce.number().int().nonnegative().default(500),
+  MAX_UPLOAD_BYTES: z.coerce.number().int().positive().default(5 * 1024 * 1024),
+
+  UPLOAD_URL_TTL_SEC: z.coerce.number().int().positive().default(10 * 60),
+  DOWNLOAD_URL_TTL_SEC: z.coerce.number().int().positive().default(10 * 60),
+
+  FFMPEG_PATH: z.string().default('ffmpeg'),
+  FFPROBE_PATH: z.string().default('ffprobe'),
 });
 
 export type Env = z.infer<typeof schema>;

@@ -12,7 +12,8 @@
       "supportsTablet": false,
       "bundleIdentifier": "com.voicealarm.app",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSMicrophoneUsageDescription": "친구에게 보낼 음성 알람을 녹음하기 위해 마이크를 사용합니다."
       }
     },
     "android": {
@@ -24,12 +25,25 @@
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "permissions": [
+        "RECORD_AUDIO"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "plugins": ["expo-dev-client", "expo-secure-store", "expo-localization"],
+    "plugins": [
+      "expo-dev-client",
+      "expo-secure-store",
+      "expo-localization",
+      [
+        "expo-audio",
+        {
+          "microphonePermission": "친구에게 보낼 음성 알람을 녹음하기 위해 마이크를 사용합니다."
+        }
+      ]
+    ],
     "extra": {
       "apiBaseUrl": ""
     }

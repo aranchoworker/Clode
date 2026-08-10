@@ -1,7 +1,15 @@
-import { beforeAll, describe, expect, it } from 'vitest';
+import { execFile } from 'node:child_process';
+import { mkdtemp, readFile, rm } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { promisify } from 'node:util';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { ApiClient } from '../src/api/client';
 import { api } from '../src/api/endpoints';
 import { MemoryTokenStore } from '../src/auth/memoryStore';
+import { uploadRecording } from '../src/recording/upload';
+
+const run = promisify(execFile);
 
 /**
  * 앱의 엔드포인트 래퍼를 실제로 돌아가는 서버에 붙여서 확인한다.
@@ -100,5 +108,90 @@ describe.skipIf(!BASE_URL)('실제 서버 연동', () => {
 
     const me = await api.auth.me(alice);
     expect(me.user.id).toBe(session.user.id);
+  });
+
+  describe('녹음 업로드', () => {
+    let workDir: string;
+
+    beforeAll(async () => {
+      workDir = await mkdtemp(join(tmpdir(), 'voicealarm-app-'));
+    });
+
+    afterAll(async () => {
+      await rm(workDir, { recursive: true, force: true });
+    });
+
+    /** ffmpeg 로 진짜 m4a 를 만든다. 더미 바이트로는 서버의 길이 검사를 통과하지 못한다. */
+    async function makeRecording(seconds: number, name: string): Promise<string> {
+      const path = join(workDir, name);
+      await run('ffmpeg', [
+        '-hide_banner', '-loglevel', 'error', '-y',
+        '-f', 'lavfi', '-i', `sine=frequency=440:duration=${seconds}`,
+        '-c:a', 'aac', '-b:a', '48k', '-ar', '22050', '-ac', '1',
+        path,
+      ]);
+      return path;
+    }
+
+    async function upload(client: ApiClient, path: string) {
+      return uploadRecording(client, path, {
+        readFile: async (uri) => {
+          const buffer = await readFile(uri);
+          return buffer.buffer.slice(
+            buffer.byteOffset,
+            buffer.byteOffset + buffer.byteLength,
+          ) as ArrayBuffer;
+        },
+      });
+    }
+
+    it('발급 → PUT → 등록이 실제 서버에서 관통하고, 서버가 길이를 직접 잰다', async () => {
+      const alice = makeClient();
+      await signUp(alice);
+
+      const result = await upload(alice, await makeRecording(3, 'ok.m4a'));
+
+      expect(result.voiceMessageId).toBeTruthy();
+      // 앱은 길이를 보내지 않는다. 이 값은 서버가 파일에서 뽑은 것이다.
+      expect(result.durationMs).toBeGreaterThan(2_500);
+      expect(result.durationMs).toBeLessThan(3_500);
+    });
+
+    it('30초를 넘기면 서버가 거부한다', async () => {
+      const alice = makeClient();
+      await signUp(alice);
+
+      await expect(upload(alice, await makeRecording(35, 'long.m4a'))).rejects.toMatchObject({
+        code: 'RECORDING_TOO_LONG',
+      });
+    });
+
+    it('iOS용 caf 다운로드 URL 이 실제로 파일을 내려준다', async () => {
+      const alice = makeClient();
+      await signUp(alice);
+      const uploaded = await upload(alice, await makeRecording(2, 'caf.m4a'));
+
+      const link = await api.voiceMessages.downloadUrl(alice, uploaded.voiceMessageId, 'ios');
+      const response = await fetch(link.url);
+
+      expect(response.status).toBe(200);
+      const bytes = new Uint8Array(await response.arrayBuffer());
+      expect(bytes.byteLength).toBeGreaterThan(0);
+      // caf 파일은 'caff' 매직으로 시작한다
+      expect(String.fromCharCode(...bytes.slice(0, 4))).toBe('caff');
+    });
+
+    it('남의 녹음은 존재 여부조차 알 수 없다', async () => {
+      const alice = makeClient();
+      const stranger = makeClient();
+      await signUp(alice);
+      await signUp(stranger);
+
+      const uploaded = await upload(alice, await makeRecording(2, 'private.m4a'));
+
+      await expect(
+        api.voiceMessages.downloadUrl(stranger, uploaded.voiceMessageId),
+      ).rejects.toMatchObject({ status: 404 });
+    });
   });
 });

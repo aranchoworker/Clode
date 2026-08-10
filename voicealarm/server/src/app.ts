@@ -10,19 +10,24 @@ import authRoutes from './modules/auth.routes.js';
 import blocksRoutes from './modules/blocks.routes.js';
 import devicesRoutes from './modules/devices.routes.js';
 import friendsRoutes from './modules/friends.routes.js';
+import storageRoutes from './modules/storage.routes.js';
+import voiceMessagesRoutes from './modules/voiceMessages.routes.js';
 import authPlugin from './plugins/auth.js';
 import prismaPlugin from './plugins/prisma.js';
 import { NoopPushSender, type PushSender } from './services/push.js';
+import { createStorage, type StorageAdapter } from './services/storage/index.js';
 
 declare module 'fastify' {
   interface FastifyInstance {
     push: PushSender;
+    storage: StorageAdapter;
   }
 }
 
 export type BuildAppOptions = {
   prisma: PrismaClient;
   push?: PushSender;
+  storage?: StorageAdapter;
   disconnectOnClose?: boolean;
   logger?: boolean;
 };
@@ -57,7 +62,8 @@ export async function buildApp(opts: BuildAppOptions): Promise<FastifyInstance> 
   await app.register(
     fp(async (instance) => {
       instance.decorate('push', opts.push ?? new NoopPushSender());
-    }, { name: 'push' }),
+      instance.decorate('storage', opts.storage ?? createStorage());
+    }, { name: 'services' }),
   );
 
   app.setErrorHandler((error, request, reply) => {
@@ -93,6 +99,8 @@ export async function buildApp(opts: BuildAppOptions): Promise<FastifyInstance> 
   await app.register(devicesRoutes);
   await app.register(friendsRoutes);
   await app.register(blocksRoutes);
+  await app.register(voiceMessagesRoutes);
+  await app.register(storageRoutes);
 
   return app;
 }

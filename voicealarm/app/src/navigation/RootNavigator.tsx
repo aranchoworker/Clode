@@ -15,6 +15,7 @@ import { BlocksScreen } from '../screens/BlocksScreen';
 import { FriendsScreen } from '../screens/FriendsScreen';
 import { HomeScreen } from '../screens/HomeScreen';
 import { LoginScreen } from '../screens/LoginScreen';
+import { RecordScreen } from '../screens/RecordScreen';
 import { SettingsScreen } from '../screens/SettingsScreen';
 import { SignupScreen } from '../screens/SignupScreen';
 import { useTheme } from '../theme';
@@ -28,6 +29,7 @@ export type MainStackParams = {
   Tabs: undefined;
   AddFriend: undefined;
   Blocks: undefined;
+  Record: undefined;
 };
 
 export type TabParams = {
@@ -55,12 +57,13 @@ function TabNavigator() {
     >
       <Tabs.Screen
         name="Home"
-        component={HomeScreen}
         options={{
           title: t('tab.home'),
           tabBarIcon: ({ color, size }) => <Ionicons name="alarm" color={color} size={size} />,
         }}
-      />
+      >
+        {({ navigation }) => <HomeScreen onCreateAlarm={() => navigation.navigate('Record')} />}
+      </Tabs.Screen>
       <Tabs.Screen
         name="Friends"
         options={{
@@ -120,6 +123,12 @@ function MainNavigator() {
         component={BlocksScreen}
         options={{ title: t('blocks.title') }}
       />
+      <MainStack.Screen
+        name="Record"
+        options={{ title: t('record.title') }}
+      >
+        {() => <RecordScreen />}
+      </MainStack.Screen>
     </MainStack.Navigator>
   );
 }

@@ -6,7 +6,7 @@
 - 지정한 시각에 수신자 기기에서 로컬 알람이 울리고, 발신자의 녹음이 재생된다
 - 수신자가 차단하면 **이미 예약된 알람도 울리지 않는다**
 
-현재 상태: **Phase 2 (앱 기초) 완료.** 아래 [개발 진행 상황](#개발-진행-상황) 참고.
+현재 상태: **Phase 3 (녹음 & 업로드) 완료.** 아래 [개발 진행 상황](#개발-진행-상황) 참고.
 
 ---
 
@@ -115,7 +115,7 @@ Android는 `STREAM_ALARM` 재생이라 무음 모드에서도 울립니다(이�
 
 - [x] **Phase 1 — 백엔드 기초**: DB 스키마 + 마이그레이션, 인증 API, 친구/차단 API, 단위 테스트
 - [x] **Phase 2 — 앱 기초**: Expo dev client 세팅, 로그인/회원가입, 친구 검색·요청·수락·차단 화면
-- [ ] **Phase 3 — 녹음 & 업로드**: 녹음 UI, 30초 제한, presigned 업로드, caf 트랜스코딩
+- [x] **Phase 3 — 녹음 & 업로드**: 녹음 UI, 30초 제한, 서명 URL 업로드, iOS용 caf 트랜스코딩
 - [ ] **Phase 4 — 알람 파이프라인**: 예약 API → 데이터 푸시 → 사전 다운로드 → 로컬 알람 → 발화 화면 → ack
 - [ ] **Phase 5 — 차단/취소 전파, 남용 방지, 신고**
 - [ ] **Phase 6 — 권한 온보딩, 재부팅 복구, 배포 설정**
@@ -166,6 +166,32 @@ voicealarm/app/
 └── tests/                       # 22개 (실서버 연동 3개 포함)
 ```
 
+### Phase 3 에서 만든 것
+
+```
+voicealarm/server/src/
+├── lib/signing.ts               # 서명 URL 토큰 (HMAC, 만료, 용도 분리)
+├── modules/
+│   ├── voiceMessages.routes.ts  # 발급 → 등록 → 다운로드 URL → 삭제
+│   └── storage.routes.ts        # 로컬 드라이버의 PUT/GET (S3 로 가면 사라짐)
+└── services/
+    ├── audio.ts                 # ffprobe 길이 검사 + ffmpeg caf 변환
+    └── storage/
+        ├── types.ts             # ★ 스토리지 경계 인터페이스
+        ├── localDisk.ts         # 개발용 로컬 디스크 어댑터
+        └── index.ts             # 드라이버 선택 (S3 추가 시 여기만 수정)
+
+voicealarm/app/src/
+├── recording/
+│   ├── options.ts               # 22.05kHz 모노 m4a, 30초/0.7초 경계값
+│   ├── useRecorder.ts           # 30초 자동 종료, 레벨 미터
+│   ├── upload.ts                # 발급 → PUT → 등록 3단계
+│   ├── normalizeMetering.ts     # dBFS → 0~1 (순수 함수라 분리)
+│   └── formatDuration.ts
+├── components/Waveform.tsx      # 입력 레벨 막대
+└── screens/RecordScreen.tsx     # 녹음 → 미리듣기 → 업로드
+```
+
 ---
 
 ## 실행 방법
@@ -174,6 +200,16 @@ voicealarm/app/
 
 - Node.js 20 이상
 - PostgreSQL 16 (로컬 설치본 사용, Docker 불필요)
+- **ffmpeg / ffprobe** — 녹음 길이 검사와 iOS용 caf 변환에 필요합니다
+
+```bash
+# Ubuntu/Debian
+sudo apt-get install -y ffmpeg
+# macOS
+brew install ffmpeg
+```
+
+ffmpeg 가 PATH 에 없으면 `.env` 의 `FFMPEG_PATH` / `FFPROBE_PATH` 에 절대 경로를 넣으세요.
 
 ### 설치 및 실행
 
@@ -208,6 +244,7 @@ npm test
 ✓ tests/auth.test.ts            (9) — 해싱, 회전, 브루트포스, 계정 은닉
 ✓ tests/friends.test.ts         (9) — 요청/수락/거절/삭제, 정확 일치 검색
 ✓ tests/blocks.test.ts         (10) — 차단 전파, 예약 알람 취소, 차단 은닉
+✓ tests/voiceMessages.test.ts  (14) — 30초 제한, caf 변환, 서명 URL, 경로 탈출 차단
 ```
 
 ---
@@ -248,12 +285,14 @@ npm run typecheck
 
 ```
 ✓ tests/client.test.ts    (9) — 토큰 자동 재발급, 동시 요청 single-flight, 에러 변환
+✓ tests/upload.test.ts    (6) — 업로드 3단계 순서, 레벨 정규화, 시간 표기
 ✓ tests/i18n.test.ts      (6) — 키 일치, 자리표시자 일치
 ✓ tests/errorMessage.test.ts (4) — 서버 코드 → 화면 언어 매핑
-✓ tests/integration.test.ts  (3) — 실제 서버 연동 (기본은 건너뜀)
+✓ tests/integration.test.ts  (7) — 실제 서버 연동 (기본은 건너뜀)
 ```
 
 **실서버 연동 테스트**는 목으로는 못 잡는 경로 오타·필드명 불일치를 잡습니다.
+ffmpeg 로 진짜 m4a 를 만들어 올려서, 30초 제한과 caf 변환까지 실제로 확인합니다.
 서버를 띄운 뒤 주소를 넘기면 실행됩니다.
 
 ```bash
@@ -320,7 +359,22 @@ cd voicealarm/app && VOICEALARM_API_URL=http://localhost:3000 npm test
 | `DELETE` | `/blocks/:userId` | 차단 해제 |
 | `GET` | `/blocks` | 내가 차단한 목록 |
 
-### 앱 화면 (Phase 2 구현분)
+### 음성 메시지 (Phase 3)
+
+| 메서드 | 경로 | 설명 |
+|---|---|---|
+| `POST` | `/voice-messages/upload-url` | 서명된 업로드 URL 발급. 키에 소유자 ID가 박힘 |
+| `PUT` | `/storage/upload?key=&token=` | 로컬 드라이버 전용. S3 로 가면 이 경로는 사라짐 |
+| `POST` | `/voice-messages` | 등록. **서버가 파일을 직접 열어 길이를 잼** + caf 생성 |
+| `GET` | `/voice-messages/:id/download-url?variant=original\|ios` | 10분 만료 서명 URL |
+| `GET` | `/storage/download?key=&token=` | 로컬 드라이버 전용 |
+| `DELETE` | `/voice-messages/:id` | 알람에 아직 안 쓰인 녹음만 삭제 가능 |
+
+업로드 흐름이 3단계인 이유는 S3 로 옮길 때 앱 코드를 안 고치기 위해서입니다. 지금은 서명
+URL 이 우리 서버를 가리키지만, S3 어댑터를 붙이면 같은 응답 형식으로 S3 presigned URL 이
+나가고 파일은 서버를 거치지 않습니다.
+
+### 앱 화면 (Phase 2~3 구현분)
 
 | 화면 | 내용 |
 |---|---|
@@ -328,6 +382,7 @@ cd voicealarm/app && VOICEALARM_API_URL=http://localhost:3000 npm test
 | 알람 (탭) | 받을 알람 / 보낸 알람 탭 구조만. 목록은 Phase 4 |
 | 친구 (탭) | 친구 / 받은 요청(뱃지) / 보낸 요청. 수락·거절·요청취소·친구삭제·차단 |
 | 친구 추가 | 아이디 정확 일치 검색 → 요청. 관계 상태에 따라 버튼이 사라짐 |
+| 녹음 | 파형(입력 레벨), 남은 시간, 30초 자동 종료, 미리듣기, 다시 녹음, 업로드 |
 | 설정 (탭) | 계정 정보, 차단 목록 진입, 로그아웃. 알람 권한은 Phase 6 |
 | 차단 목록 | 차단 해제 |
 
@@ -365,6 +420,17 @@ cd voicealarm/app && VOICEALARM_API_URL=http://localhost:3000 npm test
 **차단 해제 시 알람은 되살리지 않습니다.** 해제하는 순간 과거 시각의 알람이 한꺼번에
 울리는 사고를 막기 위해서입니다. 친구 관계 자체는 복구됩니다.
 
+**녹음 길이는 서버가 직접 잽니다.** 앱이 보내는 `duration_ms` 는 아예 받지 않습니다.
+앱을 조금만 고치면 5분짜리를 30초라고 신고할 수 있고, 그러면 30초 제한이 무의미해집니다.
+같은 이유로 형식도 실제 파일에서 판단합니다.
+
+**서명 URL 은 용도가 분리돼 있습니다.** 업로드 토큰으로 다운로드할 수 없고, 반대도 안 됩니다.
+토큰에는 대상 키가 박혀 있어서 다른 경로에 재사용할 수 없습니다. 개발용 로컬 드라이버에도
+같은 규칙을 적용한 이유는, 느슨한 개발 설정이 그대로 배포되는 일이 흔하기 때문입니다.
+
+**스토리지 키의 경로 탈출을 막습니다.** 키는 서버가 만들지만 클라이언트가 되돌려 주는
+값이라, `../` 가 섞여 들어올 수 있다고 가정하고 루트 밖 경로를 거부합니다.
+
 **차단은 단방향 기록, 양방향 효과.** `blocks` 행은 스펙대로 `blocker → blocked` 하나만
 만들지만, 전송 판정은 양방향으로 봅니다. 차단해 놓고 자기는 계속 보내는 걸 막습니다.
 
@@ -372,7 +438,8 @@ cd voicealarm/app && VOICEALARM_API_URL=http://localhost:3000 npm test
 
 ## 내가(사용자가) 직접 해야 하는 일
 
-### 지금 (Phase 2 확인용)
+### 지금 (Phase 2~3 확인용)
+- [ ] **ffmpeg 설치** — 없으면 녹음 등록이 전부 실패합니다
 - [ ] **Android**: Android Studio + SDK 설치 → `npx expo run:android`
 - [ ] **iOS**: macOS + Xcode 필요 → `npx expo run:ios` (Windows/Linux 에서는 불가)
 - [ ] 서버를 켜고(`npm run db:up && npm run dev`), 실기기라면 `app.json` 의

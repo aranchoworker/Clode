@@ -13,6 +13,13 @@ export TEST_DATABASE_URL="${TEST_DATABASE_URL:-postgresql://postgres@127.0.0.1:5
 export DATABASE_URL="$TEST_DATABASE_URL"
 export JWT_SECRET="${JWT_SECRET:-test-secret-value-that-is-long-enough-0123456789}"
 
+# 업로드 테스트가 실제 파일을 쓰므로 매 실행마다 새 임시 디렉터리를 준다.
+# 저장소 안(.storage)에 쓰면 테스트 잔여물이 쌓이고 커밋에 섞일 위험이 있다.
+STORAGE_TMP="$(mktemp -d -t voicealarm-storage-XXXXXX)"
+export STORAGE_LOCAL_DIR="$STORAGE_TMP"
+export PUBLIC_BASE_URL="${PUBLIC_BASE_URL:-http://localhost:3000}"
+trap 'rm -rf "$STORAGE_TMP"' EXIT
+
 bash scripts/dev-db.sh start >/dev/null
 
 # 테스트 DB 스키마를 스키마 파일과 강제로 일치시킨다(마이그레이션 히스토리 무관).

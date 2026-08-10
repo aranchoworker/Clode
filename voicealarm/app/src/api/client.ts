@@ -68,6 +68,17 @@ export class ApiClient {
     this.onSessionExpired = options.onSessionExpired;
   }
 
+  /**
+   * 이 클라이언트가 쓰는 fetch.
+   *
+   * 서명 URL 로의 직접 업로드처럼 API 경로를 타지 않는 요청도 같은 fetch 를 써야
+   * 테스트에서 한 번에 갈아끼울 수 있고, 나중에 타임아웃·재시도 정책을 넣을 때도
+   * 한 곳만 고치면 된다.
+   */
+  get fetchImpl(): typeof fetch {
+    return this.fetchFn;
+  }
+
   get<T>(path: string, options: RequestOptions = {}): Promise<T> {
     return this.request<T>('GET', path, options);
   }

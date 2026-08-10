@@ -38,3 +38,21 @@ export type AuthSession = {
   refresh_token: string;
   expires_in: number;
 };
+
+export type VoiceMessage = {
+  id: string;
+  duration_ms: number;
+  created_at: string;
+};
+
+export type UploadTicket = {
+  storage_key: string;
+  upload: {
+    url: string;
+    method: 'PUT';
+    headers: Record<string, string>;
+    expires_at: string;
+  };
+  max_bytes: number;
+  max_duration_ms: number;
+};

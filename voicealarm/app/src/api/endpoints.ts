@@ -6,6 +6,8 @@ import type {
   FriendRequestDirection,
   PublicUser,
   SearchResult,
+  UploadTicket,
+  VoiceMessage,
 } from './types';
 
 /**
@@ -81,6 +83,32 @@ export const api = {
 
     remove(client: ApiClient, userUuid: string) {
       return client.delete<{ ok: true }>(`/friends/${userUuid}`);
+    },
+  },
+
+  voiceMessages: {
+    createUploadUrl(client: ApiClient, mimeType: string) {
+      return client.post<UploadTicket>('/voice-messages/upload-url', {
+        body: { mime_type: mimeType },
+      });
+    },
+
+    /** 길이를 보내지 않는 건 의도다 — 서버가 실제 파일을 재서 판단한다. */
+    register(client: ApiClient, storageKey: string) {
+      return client.post<{ voice_message: VoiceMessage }>('/voice-messages', {
+        body: { storage_key: storageKey },
+      });
+    },
+
+    downloadUrl(client: ApiClient, id: string, variant: 'original' | 'ios' = 'original') {
+      return client.get<{ url: string; expires_at: string; duration_ms: number }>(
+        `/voice-messages/${id}/download-url`,
+        { query: { variant } },
+      );
+    },
+
+    remove(client: ApiClient, id: string) {
+      return client.delete<{ ok: true }>(`/voice-messages/${id}`);
     },
   },
 
