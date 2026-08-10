@@ -5,3 +5,6 @@ dist/
 *.log
 coverage/
 .storage/
+
+# Firebase 서비스 계정 키 — FCM 발송용 비밀 키, 절대 커밋하지 않는다
+firebase-service-account*.json
