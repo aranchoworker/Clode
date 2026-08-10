@@ -6,7 +6,8 @@
 - 지정한 시각에 수신자 기기에서 로컬 알람이 울리고, 발신자의 녹음이 재생된다
 - 수신자가 차단하면 **이미 예약된 알람도 울리지 않는다**
 
-현재 상태: **Phase 3 (녹음 & 업로드) 완료.** 아래 [개발 진행 상황](#개발-진행-상황) 참고.
+현재 상태: **Phase 4 절반 진행 중 — 서버 알람 파이프라인은 완료, 기기 쪽 로컬 알람 스케줄링은 미착수.**
+아래 [개발 진행 상황](#개발-진행-상황) 참고.
 
 ---
 
@@ -116,9 +117,19 @@ Android는 `STREAM_ALARM` 재생이라 무음 모드에서도 울립니다(이�
 - [x] **Phase 1 — 백엔드 기초**: DB 스키마 + 마이그레이션, 인증 API, 친구/차단 API, 단위 테스트
 - [x] **Phase 2 — 앱 기초**: Expo dev client 세팅, 로그인/회원가입, 친구 검색·요청·수락·차단 화면
 - [x] **Phase 3 — 녹음 & 업로드**: 녹음 UI, 30초 제한, 서명 URL 업로드, iOS용 caf 트랜스코딩
-- [ ] **Phase 4 — 알람 파이프라인**: 예약 API → 데이터 푸시 → 사전 다운로드 → 로컬 알람 → 발화 화면 → ack
+- [~] **Phase 4 — 알람 파이프라인** (진행 중, 아래 참고)
+  - [x] 서버: 예약 API, 목록/상세, 취소, 발화 직전 재검증, ack — 실제 FCM 발송까지 검증됨
+  - [ ] 앱: 푸시 토큰 등록, 백그라운드 수신 → 음성 파일 사전 다운로드
+  - [ ] 앱: **Android 로컬 알람 스케줄링** (AlarmManager, 풀스크린 인텐트, STREAM_ALARM) — 네이티브 모듈, 실기기/에뮬레이터 필요
+  - [ ] 앱: **iOS 로컬 알림 스케줄링** (UNCalendarNotificationTrigger, caf 사운드 번들링) — macOS/Xcode 필요
 - [ ] **Phase 5 — 차단/취소 전파, 남용 방지, 신고**
 - [ ] **Phase 6 — 권한 온보딩, 재부팅 복구, 배포 설정**
+
+> **왜 여기서 멈췄는가:** 지금부터는 실기기(또는 최소한 Android 에뮬레이터)가 있어야
+> 검증할 수 있는 네이티브 코드 영역입니다. 저는 Android Studio/Xcode가 없는 컨테이너에서
+> 작업하고 있어서, 이 이후 코드는 작성해도 실제로 동작하는지 확인할 방법이 없습니다.
+> 지금까지처럼 "테스트로 실제 동작을 증명하면서" 진행하려면 여기서 방향을 정해야 합니다
+> — 대화 마지막의 안내를 참고하세요.
 
 ### Phase 1 에서 만든 것
 
@@ -192,6 +203,31 @@ voicealarm/app/src/
 └── screens/RecordScreen.tsx     # 녹음 → 미리듣기 → 업로드
 ```
 
+### Phase 4 에서 만든 것 (서버 절반)
+
+```
+voicealarm/server/src/
+├── modules/alarms.routes.ts     # ★ 예약/목록/상세/취소/validity/ack
+├── services/
+│   ├── pushFcm.ts               # 실제 FCM 발송 (firebase-admin), 죽은 토큰 정리
+│   └── relationships.ts         # (Phase 1) — alarms.routes 가 여기 하나만 호출한다
+└── prisma/schema.prisma         # Alarm.deliveredAt 추가 (ack 시각 기록용)
+
+voicealarm/app/src/
+├── api/endpoints.ts             # api.alarms.* (create/list/get/cancel/checkValidity/ack)
+├── screens/
+│   ├── CreateAlarmScreen.tsx    # 친구 선택 → 시각 선택
+│   └── HomeScreen.tsx           # 받을/보낸 알람 목록, 상태 배지, 발신자 취소
+└── screens/RecordScreen.tsx     # alarmContext 를 받으면 업로드 직후 자동으로 알람 전송
+```
+
+**여기서 멈춘 지점**: 서버는 예약 시점에 `push.sendToUser()`로 데이터 푸시를 "보내기"까지 합니다
+(`PUSH_DRIVER=fcm`이면 실제 Firebase 서버로 전송되는 것까지 테스트로 확인했습니다).
+하지만 **그 푸시를 앱이 받아서 무엇을 하는지는 아직 없습니다** — 백그라운드 수신 핸들러,
+음성 파일 사전 다운로드, OS 로컬 알람 등록이 전부 미착수입니다. 이게 이 앱의 핵심(README
+맨 위 아키텍처 다이어그램의 오른쪽 절반)인데, 여기부터는 실기기/에뮬레이터 없이는
+"짠 코드가 실제로 동작하는지" 증명할 방법이 없어서 일단 멈췄습니다.
+
 ---
 
 ## 실행 방법
@@ -245,7 +281,14 @@ npm test
 ✓ tests/friends.test.ts         (9) — 요청/수락/거절/삭제, 정확 일치 검색
 ✓ tests/blocks.test.ts         (10) — 차단 전파, 예약 알람 취소, 차단 은닉
 ✓ tests/voiceMessages.test.ts  (14) — 30초 제한, caf 변환, 서명 URL, 경로 탈출 차단
+✓ tests/alarms.test.ts         (21) — 예약/목록/취소/validity/ack, 3대 규칙 재사용 확인
+✓ tests/pushFcm.test.ts         (1) — 실제 Firebase 자격증명 검증 (키 없으면 건너뜀)
 ```
+
+`pushFcm.test.ts`는 `firebase-service-account.json`이 있을 때만 돕니다. 더미 기기 토큰으로
+실제 FCM 서버에 발송을 시도해서 "등록되지 않은 토큰" 응답을 받는지 확인합니다 — 즉
+자격증명 자체가 유효하고 네트워크가 되는지를 검증하는 것이지, 실기기에 알림이 도착하는지는
+확인하지 않습니다(그건 앱을 실기기에 올려야 압니다).
 
 ---
 
@@ -288,7 +331,7 @@ npm run typecheck
 ✓ tests/upload.test.ts    (6) — 업로드 3단계 순서, 레벨 정규화, 시간 표기
 ✓ tests/i18n.test.ts      (6) — 키 일치, 자리표시자 일치
 ✓ tests/errorMessage.test.ts (4) — 서버 코드 → 화면 언어 매핑
-✓ tests/integration.test.ts  (7) — 실제 서버 연동 (기본은 건너뜀)
+✓ tests/integration.test.ts (10) — 실제 서버 연동: 친구/차단/업로드/알람 예약~ack (기본은 건너뜀)
 ```
 
 **실서버 연동 테스트**는 목으로는 못 잡는 경로 오타·필드명 불일치를 잡습니다.
@@ -374,24 +417,50 @@ cd voicealarm/app && VOICEALARM_API_URL=http://localhost:3000 npm test
 URL 이 우리 서버를 가리키지만, S3 어댑터를 붙이면 같은 응답 형식으로 S3 presigned URL 이
 나가고 파일은 서버를 거치지 않습니다.
 
-### 앱 화면 (Phase 2~3 구현분)
+### 알람 (Phase 4, 서버만)
+
+| 메서드 | 경로 | 설명 |
+|---|---|---|
+| `POST` | `/alarms` | 예약. 친구/차단 검증 → 생성 → 수신자에게 데이터 푸시 |
+| `GET` | `/alarms?role=sent\|received` | 목록 |
+| `GET` | `/alarms/:id` | 상세. 수신 기기가 푸시를 받은 뒤 이걸로 전체 정보를 가져옴 |
+| `DELETE` | `/alarms/:id` | 발신자 취소 (`scheduled` 상태일 때만) |
+| `GET` | `/alarms/:id/validity` | **발화 직전 재검증.** 수신 기기가 호출. 예약 시점과 완전히 같은 판정 함수를 씀 |
+| `POST` | `/alarms/:id/ack` | 발화 완료 보고 → `delivered` |
+
+`POST /alarms`의 데이터 푸시는 알림 배너 없이 조용히 보냅니다(`content-available`/`data`
+메시지). 페이로드는 `{ type, alarm_id }` 뿐이고, 나머지 정보는 앱이 `GET /alarms/:id`로
+직접 받아옵니다 — access 토큰 회전과 무관하게 항상 최신 정보를 받기 위해서입니다.
+
+### 앱 화면 (Phase 2~4 구현분)
 
 | 화면 | 내용 |
 |---|---|
 | 로그인 / 회원가입 | 아이디·비밀번호. 서버와 동일한 검증 규칙을 클라이언트에서도 적용(왕복 절약) |
-| 알람 (탭) | 받을 알람 / 보낸 알람 탭 구조만. 목록은 Phase 4 |
+| 알람 (탭) | 받을/보낸 알람 목록, 상태 배지, 발신자는 예약된 알람 취소 가능 |
+| 알람 보내기 | 친구 선택 → 시각 선택(날짜·시간 피커) → 녹음 화면으로 이어짐 |
 | 친구 (탭) | 친구 / 받은 요청(뱃지) / 보낸 요청. 수락·거절·요청취소·친구삭제·차단 |
 | 친구 추가 | 아이디 정확 일치 검색 → 요청. 관계 상태에 따라 버튼이 사라짐 |
-| 녹음 | 파형(입력 레벨), 남은 시간, 30초 자동 종료, 미리듣기, 다시 녹음, 업로드 |
+| 녹음 | 파형(입력 레벨), 남은 시간, 30초 자동 종료, 미리듣기, 다시 녹음. 알람 흐름에서 왔으면 업로드 직후 자동 전송 |
 | 설정 (탭) | 계정 정보, 차단 목록 진입, 로그아웃. 알람 권한은 Phase 6 |
 | 차단 목록 | 차단 해제 |
 
 다크 모드는 기기 설정을 따르고, 한국어/영어 i18n 구조가 잡혀 있습니다(기준은 한국어).
 
-### Phase 4 에서 추가될 것
+**"알람 보내기"를 눌러서 실제로 상대 기기가 울리는가?** 아직 아닙니다. 위 화면은 서버에
+알람을 예약하는 데까지만입니다. 수신 기기가 그걸 받아서 로컬 알람으로 등록하고 실제로
+울리게 하는 부분(이 README 맨 위 아키텍처의 오른쪽 절반)은 다음 섹션에서 설명하는 대로
+아직 없습니다.
 
-`/voice-messages/upload-url`, `/voice-messages`, `POST /alarms`, `GET /alarms`,
-`DELETE /alarms/:id`, `GET /alarms/:id/validity`, `POST /alarms/:id/ack`, `POST /reports`
+### Phase 4 에서 아직 없는 것
+
+- 앱의 푸시 토큰 등록 (`POST /devices`는 Phase 1부터 있지만, 앱이 실제 FCM 토큰을 받아
+  호출하는 코드가 없음)
+- 백그라운드 데이터 푸시 수신 → 음성 파일 사전 다운로드
+- **Android**: `AlarmManager.setAlarmClock()` 등록, 풀스크린 인텐트 발화 화면,
+  `STREAM_ALARM` 재생, `BOOT_COMPLETED` 재등록 — 전부 네이티브 Kotlin 코드 필요
+- **iOS**: `UNCalendarNotificationTrigger` 등록, caf 사운드를 `Library/Sounds/`에 배치
+- `POST /reports` (신고, Phase 5 항목)
 
 ---
 
@@ -446,19 +515,20 @@ URL 이 우리 서버를 가리키지만, S3 어댑터를 붙이면 같은 응�
       `extra.apiBaseUrl` 을 PC 의 LAN IP 로 변경
 - [ ] 두 계정으로 가입 → 아이디 검색 → 요청 → 수락 → 차단까지 눌러 보기
 
-### Phase 4 시작 전까지
-**Android / FCM**
-- [ ] Firebase 프로젝트 생성
-- [ ] Android 앱 등록 → `google-services.json` 다운로드
-- [ ] 서버용 서비스 계정 키 발급 (FCM v1 API)
+### Firebase — 완료
+- [x] Firebase 프로젝트 생성
+- [x] Android 앱 등록 → `google-services.json` (`voicealarm/app/`, gitignore 처리됨)
+- [x] iOS 앱 등록 → `GoogleService-Info.plist` (`voicealarm/app/`, gitignore 처리됨)
+- [x] 서버용 서비스 계정 키 → `voicealarm/server/firebase-service-account.json` (gitignore 처리됨).
+      서버에서 `PUSH_DRIVER=fcm`으로 실제 발송 확인함(`tests/pushFcm.test.ts`)
 
-**iOS / APNs**
-- [ ] Apple Developer Program 가입 (연 $99)
-- [ ] App ID 생성, Push Notifications capability 활성화
-- [ ] APNs 인증 키(.p8) 발급 → Firebase 콘솔에 업로드
-- [ ] 실기기 1대 이상 (시뮬레이터에서는 푸시·알람 테스트 불가)
-
-> Critical Alerts 신청은 **하지 않습니다**. [프로젝트 방침](#프로젝트-방침-별도-승인이-필요한-기능은-쓰지-않는다) 참고.
+### 남은 것 — 실기기/에뮬레이터가 있어야 다음 단계 진행 가능
+- [ ] **Android**: Android Studio + SDK 설치 → `npx expo run:android` (에뮬레이터도 가능)
+- [ ] **iOS**: macOS + Xcode 필요 → `npx expo run:ios` (시뮬레이터도 가능하나 실제 알림
+      수신·백그라운드 동작은 실기기가 아니면 정확히 확인되지 않음)
+- [ ] iOS 실기기 1대 이상 (푸시·알람은 시뮬레이터에서 제한적으로만 동작)
+- [ ] **Apple Developer Program** — iOS 로컬 알림 서명·배포에 필요 (연 $99). Critical Alerts는
+      [프로젝트 방침](#프로젝트-방침-별도-승인이-필요한-기능은-쓰지-않는다)상 신청하지 않습니다
 
 ### 스토어 심사 대비
 - [ ] 개인정보처리방침 URL (음성 녹음을 다루므로 필수)

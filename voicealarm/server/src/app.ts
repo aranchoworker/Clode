@@ -6,6 +6,7 @@ import Fastify, { type FastifyInstance } from 'fastify';
 import fp from 'fastify-plugin';
 import { env } from './config/env.js';
 import { ApiError } from './lib/errors.js';
+import alarmsRoutes from './modules/alarms.routes.js';
 import authRoutes from './modules/auth.routes.js';
 import blocksRoutes from './modules/blocks.routes.js';
 import devicesRoutes from './modules/devices.routes.js';
@@ -15,6 +16,7 @@ import voiceMessagesRoutes from './modules/voiceMessages.routes.js';
 import authPlugin from './plugins/auth.js';
 import prismaPlugin from './plugins/prisma.js';
 import { NoopPushSender, type PushSender } from './services/push.js';
+import { createFcmPushSender } from './services/pushFcm.js';
 import { createStorage, type StorageAdapter } from './services/storage/index.js';
 
 declare module 'fastify' {
@@ -61,7 +63,11 @@ export async function buildApp(opts: BuildAppOptions): Promise<FastifyInstance> 
   await app.register(authPlugin);
   await app.register(
     fp(async (instance) => {
-      instance.decorate('push', opts.push ?? new NoopPushSender());
+      // opts.push 가 명시되면(테스트) 그걸 쓴다. 아니면 PUSH_DRIVER 설정을 따른다.
+      const push = opts.push ?? (env().PUSH_DRIVER === 'fcm'
+        ? createFcmPushSender(opts.prisma)
+        : new NoopPushSender());
+      instance.decorate('push', push);
       instance.decorate('storage', opts.storage ?? createStorage());
     }, { name: 'services' }),
   );
@@ -101,6 +107,7 @@ export async function buildApp(opts: BuildAppOptions): Promise<FastifyInstance> 
   await app.register(blocksRoutes);
   await app.register(voiceMessagesRoutes);
   await app.register(storageRoutes);
+  await app.register(alarmsRoutes);
 
   return app;
 }

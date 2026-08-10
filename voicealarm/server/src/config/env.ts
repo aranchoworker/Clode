@@ -40,6 +40,13 @@ const schema = z.object({
 
   FFMPEG_PATH: z.string().default('ffmpeg'),
   FFPROBE_PATH: z.string().default('ffprobe'),
+
+  /// 'noop' 는 큐잉만 하고 실제로 보내지 않는다(테스트 기본값). 실 발송은 'fcm'.
+  PUSH_DRIVER: z.enum(['noop', 'fcm']).default('noop'),
+  FIREBASE_SERVICE_ACCOUNT_PATH: z.string().default('./firebase-service-account.json'),
+
+  /// 알람 발화 시각 제한. 예약 시점에서 이보다 가까운 미래는 남용/실수 방지를 위해 거부한다.
+  MIN_ALARM_LEAD_SEC: z.coerce.number().int().nonnegative().default(60),
 });
 
 export type Env = z.infer<typeof schema>;

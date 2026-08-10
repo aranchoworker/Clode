@@ -1,5 +1,7 @@
 import type { ApiClient } from './client';
 import type {
+  Alarm,
+  AlarmValidity,
   AuthSession,
   BlockEntry,
   FriendRequest,
@@ -109,6 +111,50 @@ export const api = {
 
     remove(client: ApiClient, id: string) {
       return client.delete<{ ok: true }>(`/voice-messages/${id}`);
+    },
+  },
+
+  alarms: {
+    create(
+      client: ApiClient,
+      input: {
+        receiverUserId: string;
+        voiceMessageId: string;
+        scheduledAt: Date;
+        timezone: string;
+        title?: string;
+      },
+    ) {
+      return client.post<{ alarm: Alarm }>('/alarms', {
+        body: {
+          receiver_user_id: input.receiverUserId,
+          voice_message_id: input.voiceMessageId,
+          scheduled_at: input.scheduledAt.toISOString(),
+          timezone: input.timezone,
+          title: input.title,
+        },
+      });
+    },
+
+    list(client: ApiClient, role: 'sent' | 'received') {
+      return client.get<{ alarms: Alarm[] }>('/alarms', { query: { role } });
+    },
+
+    get(client: ApiClient, id: string) {
+      return client.get<{ alarm: Alarm }>(`/alarms/${id}`);
+    },
+
+    cancel(client: ApiClient, id: string) {
+      return client.delete<{ ok: true }>(`/alarms/${id}`);
+    },
+
+    /** 발화 직전 수신 기기가 호출한다. 실패(네트워크 끊김)해도 예외를 던지지 않게 호출부가 감싼다. */
+    checkValidity(client: ApiClient, id: string) {
+      return client.get<AlarmValidity>(`/alarms/${id}/validity`);
+    },
+
+    ack(client: ApiClient, id: string, played: boolean) {
+      return client.post<{ ok: true }>(`/alarms/${id}/ack`, { body: { played } });
     },
   },
 

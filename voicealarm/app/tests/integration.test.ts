@@ -194,4 +194,119 @@ describe.skipIf(!BASE_URL)('실제 서버 연동', () => {
       ).rejects.toMatchObject({ status: 404 });
     });
   });
+
+  describe('알람 파이프라인', () => {
+    async function becomeFriends(a: ApiClient, aUserId: string, b: ApiClient, bUserId: string) {
+      await api.friends.sendRequest(a, bUserId);
+      const incoming = await api.friends.requests(b, 'incoming');
+      const request = incoming.requests.find((r) => r.user.user_id === aUserId);
+      if (!request) throw new Error('friend request not found');
+      await api.friends.accept(b, request.id);
+    }
+
+    it('예약 → 목록 → validity → ack 가 실제 서버에서 전부 관통한다', async () => {
+      const alice = makeClient();
+      const bob = makeClient();
+      const aliceSession = await signUp(alice);
+      const bobSession = await signUp(bob);
+      await becomeFriends(alice, aliceSession.user.user_id, bob, bobSession.user.user_id);
+
+      const workDir = await mkdtemp(join(tmpdir(), 'voicealarm-alarm-'));
+      const path = join(workDir, 'msg.m4a');
+      await run('ffmpeg', [
+        '-hide_banner', '-loglevel', 'error', '-y',
+        '-f', 'lavfi', '-i', 'sine=frequency=440:duration=2',
+        '-c:a', 'aac', '-b:a', '48k', '-ar', '22050', '-ac', '1',
+        path,
+      ]);
+      const uploaded = await uploadRecording(alice, path, {
+        readFile: async (uri) => {
+          const buffer = await readFile(uri);
+          return buffer.buffer.slice(
+            buffer.byteOffset,
+            buffer.byteOffset + buffer.byteLength,
+          ) as ArrayBuffer;
+        },
+      });
+
+      const scheduledAt = new Date(Date.now() + 5 * 60 * 1000);
+      const created = await api.alarms.create(alice, {
+        receiverUserId: bobSession.user.user_id,
+        voiceMessageId: uploaded.voiceMessageId,
+        scheduledAt,
+        timezone: 'Asia/Seoul',
+        title: '일어나!',
+      });
+      expect(created.alarm.status).toBe('scheduled');
+
+      const received = await api.alarms.list(bob, 'received');
+      expect(received.alarms.map((a) => a.id)).toContain(created.alarm.id);
+
+      const validity = await api.alarms.checkValidity(bob, created.alarm.id);
+      expect(validity).toEqual({ valid: true, reason: null });
+
+      await api.alarms.ack(bob, created.alarm.id, true);
+      const detail = await api.alarms.get(alice, created.alarm.id);
+      expect(detail.alarm.status).toBe('delivered');
+
+      await rm(workDir, { recursive: true, force: true });
+    });
+
+    it('예약 후 차단되면 validity 가 invalid 로 바뀐다', async () => {
+      const alice = makeClient();
+      const bob = makeClient();
+      const aliceSession = await signUp(alice);
+      const bobSession = await signUp(bob);
+      await becomeFriends(alice, aliceSession.user.user_id, bob, bobSession.user.user_id);
+
+      const workDir = await mkdtemp(join(tmpdir(), 'voicealarm-alarm-'));
+      const path = join(workDir, 'msg.m4a');
+      await run('ffmpeg', [
+        '-hide_banner', '-loglevel', 'error', '-y',
+        '-f', 'lavfi', '-i', 'sine=frequency=440:duration=2',
+        '-c:a', 'aac', '-b:a', '48k', '-ar', '22050', '-ac', '1',
+        path,
+      ]);
+      const uploaded = await uploadRecording(alice, path, {
+        readFile: async (uri) => {
+          const buffer = await readFile(uri);
+          return buffer.buffer.slice(
+            buffer.byteOffset,
+            buffer.byteOffset + buffer.byteLength,
+          ) as ArrayBuffer;
+        },
+      });
+
+      const created = await api.alarms.create(alice, {
+        receiverUserId: bobSession.user.user_id,
+        voiceMessageId: uploaded.voiceMessageId,
+        scheduledAt: new Date(Date.now() + 5 * 60 * 1000),
+        timezone: 'Asia/Seoul',
+      });
+
+      await api.blocks.create(bob, aliceSession.user.user_id);
+
+      const validity = await api.alarms.checkValidity(bob, created.alarm.id);
+      expect(validity).toEqual({ valid: false, reason: 'blocked' });
+
+      await rm(workDir, { recursive: true, force: true });
+    });
+
+    it('친구가 아니면 알람 생성이 거부된다', async () => {
+      const alice = makeClient();
+      const bob = makeClient();
+      await signUp(alice);
+      const bobSession = await signUp(bob);
+
+      await expect(
+        api.alarms.create(alice, {
+          receiverUserId: bobSession.user.user_id,
+          // 형식만 유효한 무작위 UUID. 존재하지 않아도 친구 검증이 먼저 걸린다.
+          voiceMessageId: '00000000-0000-4000-8000-000000000000',
+          scheduledAt: new Date(Date.now() + 5 * 60 * 1000),
+          timezone: 'Asia/Seoul',
+        }),
+      ).rejects.toMatchObject({ code: 'NOT_FRIENDS' });
+    });
+  });
 });

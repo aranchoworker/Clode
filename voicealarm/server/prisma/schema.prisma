@@ -168,6 +168,7 @@ model Alarm {
   status         AlarmStatus @default(scheduled)
   createdAt      DateTime    @default(now()) @map("created_at")
   cancelledAt    DateTime?   @map("cancelled_at")
+  deliveredAt    DateTime?   @map("delivered_at")
 
   sender       User         @relation("AlarmSender", fields: [senderId], references: [id], onDelete: Cascade)
   receiver     User         @relation("AlarmReceiver", fields: [receiverId], references: [id], onDelete: Cascade)

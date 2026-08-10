@@ -2,6 +2,7 @@ import { File } from 'expo-file-system';
 import { useAudioPlayer, useAudioPlayerStatus } from 'expo-audio';
 import { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
+import { api } from '../api/endpoints';
 import { useSession } from '../auth/AuthContext';
 import { Button, ErrorBanner, Heading, Muted, Screen } from '../components';
 import { Waveform } from '../components/Waveform';
@@ -12,16 +13,27 @@ import { uploadRecording } from '../recording/upload';
 import { useRecorder } from '../recording/useRecorder';
 import { useTheme } from '../theme';
 
+/** 알람 만들기 흐름(친구 선택 → 시간 선택)에서 넘어올 때 채워지는 컨텍스트. */
+export type AlarmContext = {
+  receiverUserId: string;
+  receiverDisplayName: string;
+  scheduledAt: string;
+  timezone: string;
+};
+
 /**
  * 녹음 → 미리듣기 → 업로드.
  *
- * Phase 4 에서 이 화면은 "알람 만들기" 흐름의 한 단계가 된다(친구 선택 → 시간 → 녹음 → 전송).
- * 지금은 업로드까지만 확인할 수 있게 독립 화면으로 둔다.
+ * alarmContext 가 있으면(친구·시간을 먼저 고르고 온 경우) 업로드 성공 직후 자동으로
+ * POST /alarms 까지 이어서 호출한다. 없으면 업로드까지만 하는 독립 화면으로 동작한다
+ * (Phase 3 에서 만든 진입점, 설정 화면 등에서 여전히 씀).
  */
 export function RecordScreen({
-  onUploaded,
+  alarmContext,
+  onSent,
 }: {
-  onUploaded?: (voiceMessageId: string, durationMs: number) => void;
+  alarmContext?: AlarmContext;
+  onSent?: () => void;
 }) {
   const { t } = useI18n();
   const { colors, radius, spacing } = useTheme();
@@ -31,6 +43,9 @@ export function RecordScreen({
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<unknown>(null);
   const [uploadedId, setUploadedId] = useState<string | null>(null);
+  const [sending, setSending] = useState(false);
+  const [sendError, setSendError] = useState<unknown>(null);
+  const [sent, setSent] = useState(false);
 
   const player = useAudioPlayer(recorder.uri ? { uri: recorder.uri } : null);
   const playerStatus = useAudioPlayerStatus(player);
@@ -52,7 +67,10 @@ export function RecordScreen({
         },
       });
       setUploadedId(result.voiceMessageId);
-      onUploaded?.(result.voiceMessageId, result.durationMs);
+
+      if (alarmContext) {
+        await sendAlarm(result.voiceMessageId);
+      }
     } catch (error) {
       setUploadError(error);
     } finally {
@@ -60,18 +78,52 @@ export function RecordScreen({
     }
   }
 
+  async function sendAlarm(voiceMessageId: string) {
+    if (!alarmContext) return;
+
+    setSending(true);
+    setSendError(null);
+    try {
+      await api.alarms.create(client, {
+        receiverUserId: alarmContext.receiverUserId,
+        voiceMessageId,
+        scheduledAt: new Date(alarmContext.scheduledAt),
+        timezone: alarmContext.timezone,
+      });
+      setSent(true);
+    } catch (error) {
+      setSendError(error);
+    } finally {
+      setSending(false);
+    }
+  }
+
   function handleRerecord() {
     player.pause();
     setUploadedId(null);
     setUploadError(null);
+    setSendError(null);
     recorder.reset();
+  }
+
+  if (sent) {
+    return (
+      <Screen>
+        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: spacing.lg }}>
+          <Text style={{ fontSize: 40 }}>⏰</Text>
+          <Heading>{t('alarm.sent.title')}</Heading>
+          <Muted>{t('alarm.sent.body', { name: alarmContext!.receiverDisplayName })}</Muted>
+          <Button label={t('common.confirm')} onPress={() => onSent?.()} />
+        </View>
+      </Screen>
+    );
   }
 
   return (
     <Screen scroll>
-      <Heading>{t('record.title')}</Heading>
+      <Heading>{alarmContext ? t('record.titleForAlarm') : t('record.title')}</Heading>
 
-      <ErrorBanner error={uploadError} />
+      <ErrorBanner error={uploadError ?? sendError} />
       {recorder.error ? <RecorderErrorNote error={recorder.error} /> : null}
 
       <Waveform levels={recorder.levels} active={recorder.phase === 'recording'} />
@@ -103,10 +155,16 @@ export function RecordScreen({
             }}
           />
           <Button
-            label={uploadedId ? t('record.uploaded') : t('record.upload')}
+            label={
+              alarmContext
+                ? t('record.sendAlarm', { name: alarmContext.receiverDisplayName })
+                : uploadedId
+                  ? t('record.uploaded')
+                  : t('record.upload')
+            }
             onPress={() => void handleUpload()}
-            loading={uploading}
-            disabled={uploadedId !== null}
+            loading={uploading || sending}
+            disabled={uploadedId !== null && !alarmContext}
           />
           <Button label={t('record.rerecord')} variant="ghost" onPress={handleRerecord} />
         </View>

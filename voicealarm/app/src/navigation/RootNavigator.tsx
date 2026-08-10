@@ -12,10 +12,11 @@ import { useAuth } from '../auth/AuthContext';
 import { useI18n } from '../i18n/context';
 import { AddFriendScreen } from '../screens/AddFriendScreen';
 import { BlocksScreen } from '../screens/BlocksScreen';
+import { CreateAlarmScreen } from '../screens/CreateAlarmScreen';
 import { FriendsScreen } from '../screens/FriendsScreen';
 import { HomeScreen } from '../screens/HomeScreen';
 import { LoginScreen } from '../screens/LoginScreen';
-import { RecordScreen } from '../screens/RecordScreen';
+import { RecordScreen, type AlarmContext } from '../screens/RecordScreen';
 import { SettingsScreen } from '../screens/SettingsScreen';
 import { SignupScreen } from '../screens/SignupScreen';
 import { useTheme } from '../theme';
@@ -29,7 +30,9 @@ export type MainStackParams = {
   Tabs: undefined;
   AddFriend: undefined;
   Blocks: undefined;
-  Record: undefined;
+  /** alarmContext 없이 진입하면 독립 녹음 화면(업로드까지만), 있으면 알람 전송까지 이어간다. */
+  Record: { alarmContext?: AlarmContext } | undefined;
+  CreateAlarm: undefined;
 };
 
 export type TabParams = {
@@ -62,7 +65,9 @@ function TabNavigator() {
           tabBarIcon: ({ color, size }) => <Ionicons name="alarm" color={color} size={size} />,
         }}
       >
-        {({ navigation }) => <HomeScreen onCreateAlarm={() => navigation.navigate('Record')} />}
+        {({ navigation }) => (
+          <HomeScreen onCreateAlarm={() => navigation.navigate('CreateAlarm')} />
+        )}
       </Tabs.Screen>
       <Tabs.Screen
         name="Friends"
@@ -124,10 +129,27 @@ function MainNavigator() {
         options={{ title: t('blocks.title') }}
       />
       <MainStack.Screen
-        name="Record"
-        options={{ title: t('record.title') }}
+        name="CreateAlarm"
+        options={{ title: t('createAlarm.title') }}
       >
-        {() => <RecordScreen />}
+        {({ navigation }) => (
+          <CreateAlarmScreen
+            onNext={(context) => navigation.navigate('Record', { alarmContext: context })}
+          />
+        )}
+      </MainStack.Screen>
+      <MainStack.Screen
+        name="Record"
+        options={({ route }) => ({
+          title: route.params?.alarmContext ? t('record.titleForAlarm') : t('record.title'),
+        })}
+      >
+        {({ route, navigation }) => (
+          <RecordScreen
+            alarmContext={route.params?.alarmContext}
+            onSent={() => navigation.navigate('Tabs')}
+          />
+        )}
       </MainStack.Screen>
     </MainStack.Navigator>
   );

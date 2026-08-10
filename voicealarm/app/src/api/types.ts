@@ -56,3 +56,24 @@ export type UploadTicket = {
   max_bytes: number;
   max_duration_ms: number;
 };
+
+export type AlarmStatus = 'scheduled' | 'delivered' | 'cancelled' | 'blocked' | 'failed';
+
+export type Alarm = {
+  id: string;
+  sender: PublicUser;
+  receiver: PublicUser;
+  voice_message: { id: string; duration_ms: number };
+  scheduled_at: string;
+  timezone: string;
+  title: string | null;
+  status: AlarmStatus;
+  created_at: string;
+  cancelled_at: string | null;
+  delivered_at: string | null;
+};
+
+export type AlarmValidity = {
+  valid: boolean;
+  reason: string | null;
+};

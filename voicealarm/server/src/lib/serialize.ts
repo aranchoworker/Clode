@@ -40,3 +40,33 @@ export function friendRequest(row: FriendshipInput, viewerId: string) {
     responded_at: row.respondedAt?.toISOString() ?? null,
   };
 }
+
+export type AlarmInput = {
+  id: string;
+  sender: PublicUserInput;
+  receiver: PublicUserInput;
+  voiceMessage: { id: string; durationMs: number };
+  scheduledAt: Date;
+  timezone: string;
+  title: string | null;
+  status: string;
+  createdAt: Date;
+  cancelledAt: Date | null;
+  deliveredAt: Date | null;
+};
+
+export function alarm(row: AlarmInput) {
+  return {
+    id: row.id,
+    sender: publicUser(row.sender),
+    receiver: publicUser(row.receiver),
+    voice_message: { id: row.voiceMessage.id, duration_ms: row.voiceMessage.durationMs },
+    scheduled_at: row.scheduledAt.toISOString(),
+    timezone: row.timezone,
+    title: row.title,
+    status: row.status,
+    created_at: row.createdAt.toISOString(),
+    cancelled_at: row.cancelledAt?.toISOString() ?? null,
+    delivered_at: row.deliveredAt?.toISOString() ?? null,
+  };
+}
