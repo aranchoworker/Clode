@@ -1,0 +1,212 @@
+// VoiceAlarm 데이터 모델
+//
+// 설계 노트
+// - 친구 관계(friendships)는 방향이 있는 1행(requester -> addressee)으로만 저장한다.
+//   "친구인가?"는 양방향 조회로 판정한다(아래 relationships.ts). 수락 시 반대 방향 행을
+//   추가로 만들지 않기 때문에 상태가 두 곳으로 갈라질 여지가 없다.
+// - 차단(blocks)은 스펙대로 단방향으로 "기록"하되, 전송 가능 여부 판정은 양방향으로 한다.
+//   즉 A가 B를 차단하면 B도 A에게 못 보낸다.
+// - alarms.status 는 예약 시점의 판정 결과가 아니라 알람의 생애주기다. 실제 발화 가능
+//   여부는 발화 직전 /alarms/:id/validity 에서 다시 계산한다(예약 시점 판정을 신뢰하지 않음).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Platform {
+  ios
+  android
+}
+
+enum FriendshipStatus {
+  pending
+  accepted
+  rejected
+  cancelled
+}
+
+enum AlarmStatus {
+  scheduled
+  delivered
+  cancelled
+  blocked
+  failed
+}
+
+model User {
+  id           String    @id @default(uuid()) @db.Uuid
+  /// 로그인용 아이디. 대소문자 무시 검색을 위해 항상 소문자로 정규화해 저장한다.
+  userId       String    @unique @map("user_id")
+  passwordHash String    @map("password_hash")
+  displayName  String    @map("display_name")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  deletedAt    DateTime? @map("deleted_at")
+
+  devices             Device[]
+  refreshTokens       RefreshToken[]
+  sentRequests        Friendship[]   @relation("FriendshipRequester")
+  receivedRequests    Friendship[]   @relation("FriendshipAddressee")
+  blocksMade          Block[]        @relation("Blocker")
+  blocksReceived      Block[]        @relation("Blocked")
+  voiceMessages       VoiceMessage[]
+  sentAlarms          Alarm[]        @relation("AlarmSender")
+  receivedAlarms      Alarm[]        @relation("AlarmReceiver")
+  reportsMade         Report[]       @relation("Reporter")
+  reportsReceived     Report[]       @relation("Reported")
+
+  @@index([deletedAt])
+  @@map("users")
+}
+
+model Device {
+  id         String   @id @default(uuid()) @db.Uuid
+  userId     String   @map("user_id") @db.Uuid
+  platform   Platform
+  pushToken  String   @map("push_token")
+  appVersion String?  @map("app_version")
+  lastSeenAt DateTime @default(now()) @map("last_seen_at")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  /// 같은 푸시 토큰이 다른 계정으로 재등록될 수 있으므로(기기 공유/재로그인)
+  /// 토큰 자체를 유니크로 잡고 재등록 시 소유자를 옮긴다.
+  @@unique([pushToken])
+  @@index([userId])
+  @@map("devices")
+}
+
+model RefreshToken {
+  id        String    @id @default(uuid()) @db.Uuid
+  userId    String    @map("user_id") @db.Uuid
+  /// 원문이 아니라 SHA-256 해시를 저장한다. DB가 유출돼도 토큰을 그대로 쓸 수 없다.
+  tokenHash String    @unique @map("token_hash")
+  expiresAt DateTime  @map("expires_at")
+  revokedAt DateTime? @map("revoked_at")
+  /// 회전 시 새 토큰을 가리킨다. 이미 회전된 토큰이 다시 쓰이면 탈취로 보고 계열 전체를 폐기한다.
+  replacedById String? @map("replaced_by_id") @db.Uuid
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("refresh_tokens")
+}
+
+/// 로그인 브루트포스 방어용 카운터. key 는 "user:<id>" 또는 "ip:<addr>".
+model AuthThrottle {
+  key         String    @id
+  failCount   Int       @default(0) @map("fail_count")
+  lockedUntil DateTime? @map("locked_until")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  @@map("auth_throttle")
+}
+
+model Friendship {
+  id          String           @id @default(uuid()) @db.Uuid
+  requesterId String           @map("requester_id") @db.Uuid
+  addresseeId String           @map("addressee_id") @db.Uuid
+  status      FriendshipStatus @default(pending)
+  requestedAt DateTime         @default(now()) @map("requested_at")
+  respondedAt DateTime?        @map("responded_at")
+
+  requester User @relation("FriendshipRequester", fields: [requesterId], references: [id], onDelete: Cascade)
+  addressee User @relation("FriendshipAddressee", fields: [addresseeId], references: [id], onDelete: Cascade)
+
+  @@unique([requesterId, addresseeId])
+  @@index([addresseeId, status])
+  @@index([requesterId, status])
+  @@map("friendships")
+}
+
+model Block {
+  id        String   @id @default(uuid()) @db.Uuid
+  blockerId String   @map("blocker_id") @db.Uuid
+  blockedId String   @map("blocked_id") @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at")
+
+  blocker User @relation("Blocker", fields: [blockerId], references: [id], onDelete: Cascade)
+  blocked User @relation("Blocked", fields: [blockedId], references: [id], onDelete: Cascade)
+
+  @@unique([blockerId, blockedId])
+  @@index([blockedId])
+  @@map("blocks")
+}
+
+model VoiceMessage {
+  id         String   @id @default(uuid()) @db.Uuid
+  ownerId    String   @map("owner_id") @db.Uuid
+  storageKey String   @map("storage_key")
+  durationMs Int      @map("duration_ms")
+  mimeType   String   @map("mime_type")
+  /// iOS 알림 사운드용 caf 트랜스코딩본. 변환 완료 전에는 null.
+  iosCafKey  String?  @map("ios_caf_key")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  owner  User    @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  alarms Alarm[]
+
+  @@index([ownerId])
+  @@map("voice_messages")
+}
+
+model Alarm {
+  id             String      @id @default(uuid()) @db.Uuid
+  senderId       String      @map("sender_id") @db.Uuid
+  receiverId     String      @map("receiver_id") @db.Uuid
+  voiceMessageId String      @map("voice_message_id") @db.Uuid
+  scheduledAt    DateTime    @map("scheduled_at")
+  /// 발신자가 지정한 IANA 타임존. scheduled_at 은 항상 UTC 로 저장한다.
+  timezone       String
+  title          String?
+  status         AlarmStatus @default(scheduled)
+  createdAt      DateTime    @default(now()) @map("created_at")
+  cancelledAt    DateTime?   @map("cancelled_at")
+
+  sender       User         @relation("AlarmSender", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver     User         @relation("AlarmReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+  voiceMessage VoiceMessage @relation(fields: [voiceMessageId], references: [id], onDelete: Cascade)
+  events       AlarmEvent[]
+  reports      Report[]
+
+  @@index([receiverId, scheduledAt])
+  @@index([senderId, scheduledAt])
+  /// 남용 방지(발신자-수신자 24시간 한도) 집계용
+  @@index([senderId, receiverId, createdAt])
+  @@map("alarms")
+}
+
+model AlarmEvent {
+  id        String   @id @default(uuid()) @db.Uuid
+  alarmId   String   @map("alarm_id") @db.Uuid
+  eventType String   @map("event_type")
+  payload   Json?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  alarm Alarm @relation(fields: [alarmId], references: [id], onDelete: Cascade)
+
+  @@index([alarmId, createdAt])
+  @@map("alarm_events")
+}
+
+model Report {
+  id         String   @id @default(uuid()) @db.Uuid
+  reporterId String   @map("reporter_id") @db.Uuid
+  reportedId String   @map("reported_id") @db.Uuid
+  alarmId    String?  @map("alarm_id") @db.Uuid
+  reason     String
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  reporter User   @relation("Reporter", fields: [reporterId], references: [id], onDelete: Cascade)
+  reported User   @relation("Reported", fields: [reportedId], references: [id], onDelete: Cascade)
+  alarm    Alarm? @relation(fields: [alarmId], references: [id], onDelete: SetNull)
+
+  @@index([reportedId, createdAt])
+  @@map("reports")
+}
