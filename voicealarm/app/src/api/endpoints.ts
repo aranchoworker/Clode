@@ -114,6 +114,28 @@ export const api = {
     },
   },
 
+  devices: {
+    register(
+      client: ApiClient,
+      input: { platform: 'ios' | 'android'; pushToken: string; appVersion?: string },
+    ) {
+      return client.post<{ device: { id: string; platform: string; last_seen_at: string } }>(
+        '/devices',
+        {
+          body: {
+            platform: input.platform,
+            push_token: input.pushToken,
+            app_version: input.appVersion,
+          },
+        },
+      );
+    },
+
+    unregister(client: ApiClient, pushToken: string) {
+      return client.delete<{ ok: true }>('/devices', { body: { push_token: pushToken } });
+    },
+  },
+
   alarms: {
     create(
       client: ApiClient,

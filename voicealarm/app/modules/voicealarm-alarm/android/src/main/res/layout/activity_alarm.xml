@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  android:orientation="vertical"
+  android:gravity="center"
+  android:background="#0E1013"
+  android:padding="32dp">
+
+  <TextView
+    android:id="@+id/senderNameText"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:textColor="#FFFFFF"
+    android:textSize="28sp"
+    android:textStyle="bold"
+    android:gravity="center" />
+
+  <TextView
+    android:id="@+id/titleText"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="12dp"
+    android:textColor="#9AA3AF"
+    android:textSize="16sp"
+    android:gravity="center" />
+
+  <LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="64dp"
+    android:orientation="horizontal"
+    android:gravity="center">
+
+    <Button
+      android:id="@+id/snoozeButton"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:layout_weight="1"
+      android:layout_marginEnd="8dp"
+      android:text="다시 알림" />
+
+    <Button
+      android:id="@+id/dismissButton"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:layout_weight="1"
+      android:layout_marginStart="8dp"
+      android:text="해제" />
+  </LinearLayout>
+</LinearLayout>

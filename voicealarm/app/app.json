@@ -13,7 +13,11 @@
       "bundleIdentifier": "com.voicealarm.app",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
-        "NSMicrophoneUsageDescription": "친구에게 보낼 음성 알람을 녹음하기 위해 마이크를 사용합니다."
+        "NSMicrophoneUsageDescription": "친구에게 보낼 음성 알람을 녹음하기 위해 마이크를 사용합니다.",
+        "UIBackgroundModes": ["remote-notification"]
+      },
+      "entitlements": {
+        "com.apple.developer.usernotifications.time-sensitive": true
       }
     },
     "android": {
@@ -27,7 +31,14 @@
       "predictiveBackGestureEnabled": false,
       "edgeToEdgeEnabled": true,
       "permissions": [
-        "RECORD_AUDIO"
+        "RECORD_AUDIO",
+        "SCHEDULE_EXACT_ALARM",
+        "USE_FULL_SCREEN_INTENT",
+        "RECEIVE_BOOT_COMPLETED",
+        "FOREGROUND_SERVICE",
+        "FOREGROUND_SERVICE_MEDIA_PLAYBACK",
+        "WAKE_LOCK",
+        "VIBRATE"
       ]
     },
     "web": {

@@ -1,0 +1,32 @@
+plugins {
+  id 'com.android.library'
+  id 'expo-module-gradle-plugin'
+}
+
+group = 'expo.modules.voicealarmalarm'
+version = '0.1.0'
+
+android {
+  namespace "expo.modules.voicealarmalarm"
+  defaultConfig {
+    versionCode 1
+    versionName "0.1.0"
+  }
+
+  compileOptions {
+    targetCompatibility JavaVersion.VERSION_1_8
+  }
+}
+
+repositories {
+  mavenCentral()
+}
+
+dependencies {
+  implementation 'androidx.appcompat:appcompat:1.7.1'
+  implementation 'androidx.core:core-ktx:1.15.0'
+  // 토큰을 Android Keystore 로 암호화해서 저장한다(CredentialsStore.kt).
+  // 이 좌표는 이 글을 쓰는 시점 기준 최신 alpha 다 — androidx.security.crypto 는
+  // 오랫동안 stable 릴리스가 없다. 빌드 시점에 더 새 버전이 있으면 올려도 된다.
+  implementation 'androidx.security:security-crypto:1.1.0-alpha06'
+}

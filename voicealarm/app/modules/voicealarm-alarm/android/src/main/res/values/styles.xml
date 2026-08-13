@@ -1,0 +1,13 @@
+<resources>
+  <!--
+    발화 화면 전용 테마. 상태바/네비게이션바를 최대한 가리고 잠금 화면 위에 뜨게 한다.
+    실제 동작(잠금 화면 위 표시, 화면 켜짐)은 AlarmActivity.onCreate() 의
+    setShowWhenLocked/setTurnScreenOn 호출과 함께 작동한다(매니페스트 속성만으로는
+    API 27 미만에서 동작하지 않는다).
+  -->
+  <style name="VoicealarmAlarmTheme" parent="Theme.AppCompat.NoActionBar">
+    <item name="android:windowFullscreen">true</item>
+    <item name="android:windowNoTitle">true</item>
+    <item name="android:windowBackground">@android:color/black</item>
+  </style>
+</resources>

@@ -6,8 +6,10 @@
 - 지정한 시각에 수신자 기기에서 로컬 알람이 울리고, 발신자의 녹음이 재생된다
 - 수신자가 차단하면 **이미 예약된 알람도 울리지 않는다**
 
-현재 상태: **Phase 4 절반 진행 중 — 서버 알람 파이프라인은 완료, 기기 쪽 로컬 알람 스케줄링은 미착수.**
-아래 [개발 진행 상황](#개발-진행-상황) 참고.
+현재 상태: **Phase 4 코드 작성 완료, 실기기 검증 대기.** 서버 알람 파이프라인과 앱의
+푸시 수신·다운로드·로컬 알람 등록 코드까지 전부 작성했지만, **Android 의 네이티브
+알람 스케줄링 모듈은 컴파일/실기기 검증이 안 된 상태입니다** — 이 컨테이너에는
+Android 개발 도구가 없습니다. 아래 [개발 진행 상황](#개발-진행-상황) 참고.
 
 ---
 
@@ -117,19 +119,25 @@ Android는 `STREAM_ALARM` 재생이라 무음 모드에서도 울립니다(이�
 - [x] **Phase 1 — 백엔드 기초**: DB 스키마 + 마이그레이션, 인증 API, 친구/차단 API, 단위 테스트
 - [x] **Phase 2 — 앱 기초**: Expo dev client 세팅, 로그인/회원가입, 친구 검색·요청·수락·차단 화면
 - [x] **Phase 3 — 녹음 & 업로드**: 녹음 UI, 30초 제한, 서명 URL 업로드, iOS용 caf 트랜스코딩
-- [~] **Phase 4 — 알람 파이프라인** (진행 중, 아래 참고)
-  - [x] 서버: 예약 API, 목록/상세, 취소, 발화 직전 재검증, ack — 실제 FCM 발송까지 검증됨
-  - [ ] 앱: 푸시 토큰 등록, 백그라운드 수신 → 음성 파일 사전 다운로드
-  - [ ] 앱: **Android 로컬 알람 스케줄링** (AlarmManager, 풀스크린 인텐트, STREAM_ALARM) — 네이티브 모듈, 실기기/에뮬레이터 필요
-  - [ ] 앱: **iOS 로컬 알림 스케줄링** (UNCalendarNotificationTrigger, caf 사운드 번들링) — macOS/Xcode 필요
+- [~] **Phase 4 — 알람 파이프라인** (코드는 다 있음, 검증 상태가 층마다 다름 — 아래 참고)
+  - [x] 서버: 예약 API, 목록/상세, 취소, 발화 직전 재검증, ack — **실제 FCM 발송까지 테스트로 검증됨**
+  - [x] 앱: 푸시 토큰 등록, 백그라운드 데이터 푸시 수신 → 음성 파일 사전 다운로드 —
+        **타입체크만 통과, 실기기 미검증**
+  - [x] 앱: **iOS 로컬 알림 스케줄링** (`expo-notifications` 만으로, 네이티브 코드 없음) —
+        **타입체크만 통과, 실기기 미검증**
+  - [~] 앱: **Android 로컬 알람 스케줄링** (AlarmManager, 풀스크린 인텐트, Foreground Service,
+        STREAM_ALARM, 재부팅 복구) — **네이티브 Kotlin 모듈 작성 완료, 컴파일조차 안 해봤음**
+        (`app/modules/voicealarm-alarm/README.md` 에 자세한 상태 기록)
 - [ ] **Phase 5 — 차단/취소 전파, 남용 방지, 신고**
 - [ ] **Phase 6 — 권한 온보딩, 재부팅 복구, 배포 설정**
 
-> **왜 여기서 멈췄는가:** 지금부터는 실기기(또는 최소한 Android 에뮬레이터)가 있어야
-> 검증할 수 있는 네이티브 코드 영역입니다. 저는 Android Studio/Xcode가 없는 컨테이너에서
-> 작업하고 있어서, 이 이후 코드는 작성해도 실제로 동작하는지 확인할 방법이 없습니다.
-> 지금까지처럼 "테스트로 실제 동작을 증명하면서" 진행하려면 여기서 방향을 정해야 합니다
-> — 대화 마지막의 안내를 참고하세요.
+> **"코드는 있는데 왜 검증이 안 됐다는 건가?"** 이 컨테이너에는 Android Studio, Xcode,
+> 실기기, 에뮬레이터가 전혀 없습니다. TypeScript 쪽(`npm run typecheck`, `npm test`,
+> `npx expo export`)은 실행·확인했지만, 그건 "코드가 컴파일되고 로직이 맞다"는 것이지
+> "실제 기기에서 알람이 울린다"는 것과는 다릅니다. 특히 **Android 의 Kotlin 코드는
+> 한 번도 컴파일해 본 적이 없습니다** — 문법 오류가 있을 수도 있습니다. 실기기로
+> 검증하기 전까지는 "짜 놓긴 했다" 이상의 확신을 드릴 수 없습니다. 정확히 뭘 확인해야
+> 하는지는 `app/modules/voicealarm-alarm/README.md` 의 체크리스트를 참고하세요.
 
 ### Phase 1 에서 만든 것
 
@@ -203,7 +211,7 @@ voicealarm/app/src/
 └── screens/RecordScreen.tsx     # 녹음 → 미리듣기 → 업로드
 ```
 
-### Phase 4 에서 만든 것 (서버 절반)
+### Phase 4 에서 만든 것
 
 ```
 voicealarm/server/src/
@@ -214,19 +222,58 @@ voicealarm/server/src/
 └── prisma/schema.prisma         # Alarm.deliveredAt 추가 (ack 시각 기록용)
 
 voicealarm/app/src/
-├── api/endpoints.ts             # api.alarms.* (create/list/get/cancel/checkValidity/ack)
+├── api/endpoints.ts             # api.alarms.* / api.devices.*
 ├── screens/
 │   ├── CreateAlarmScreen.tsx    # 친구 선택 → 시각 선택
 │   └── HomeScreen.tsx           # 받을/보낸 알람 목록, 상태 배지, 발신자 취소
-└── screens/RecordScreen.tsx     # alarmContext 를 받으면 업로드 직후 자동으로 알람 전송
+├── screens/RecordScreen.tsx     # alarmContext 를 받으면 업로드 직후 자동으로 알람 전송
+├── alarms/
+│   ├── prefetch.ts              # GET /alarms/:id + 음성 파일 다운로드
+│   ├── schedule.ts              # ★ 플랫폼 분기 지점 (iOS/Android 스케줄러 중 선택)
+│   ├── iosAlarm.ts              # iOS 로컬 알림 예약/취소 (순수 JS)
+│   ├── androidAlarm.ts          # 네이티브 모듈 얇은 래퍼
+│   └── paths.ts                 # 다운로드 경로, iOS Library/Sounds 경로 유도
+└── push/
+    ├── setup.ts                 # 앱 시작 시 알림 핸들러·카테고리 등록
+    ├── usePushRegistration.ts   # 로그인 후 FCM/APNs 토큰을 서버에 등록
+    ├── backgroundTask.ts        # TaskManager 기반 백그라운드 푸시/액션 처리
+    ├── handleAlarmPush.ts       # 푸시 한 건 처리(예약/취소) — 태스크·포그라운드 공용
+    ├── backgroundClient.ts      # React 밖에서 쓰는 독립 ApiClient
+    └── pushPayload.ts           # FCM data 페이로드 파싱 (테스트 있음)
+
+voicealarm/app/modules/voicealarm-alarm/   # Android 전용 네이티브 모듈 (Kotlin)
+├── android/src/main/java/.../
+│   ├── VoicealarmAlarmModule.kt # JS ↔ 네이티브 경계
+│   ├── AlarmScheduler.kt        # AlarmManager.setAlarmClock() 등록/취소
+│   ├── AlarmReceiver.kt         # 발화 시각에 깨어나는 지점
+│   ├── AlarmForegroundService.kt# ★ 발화 직전 재검증 + STREAM_ALARM 재생 + 풀스크린 알림
+│   ├── AlarmActivity.kt         # 잠금 화면 위 발화 UI (다시 알림/해제)
+│   ├── BootReceiver.kt          # 재부팅 후 재등록
+│   ├── AlarmStore.kt            # 예약 알람 영속 저장 (재부팅 복구용)
+│   ├── CredentialsStore.kt      # 네이티브 코드가 쓰는 암호화된 토큰 저장소
+│   └── AlarmApiClient.kt        # HttpURLConnection 기반 최소 HTTP 클라이언트
+└── README.md                    # ★ 검증 안 된 지점 체크리스트 — 빌드 전에 꼭 읽을 것
 ```
 
-**여기서 멈춘 지점**: 서버는 예약 시점에 `push.sendToUser()`로 데이터 푸시를 "보내기"까지 합니다
-(`PUSH_DRIVER=fcm`이면 실제 Firebase 서버로 전송되는 것까지 테스트로 확인했습니다).
-하지만 **그 푸시를 앱이 받아서 무엇을 하는지는 아직 없습니다** — 백그라운드 수신 핸들러,
-음성 파일 사전 다운로드, OS 로컬 알람 등록이 전부 미착수입니다. 이게 이 앱의 핵심(README
-맨 위 아키텍처 다이어그램의 오른쪽 절반)인데, 여기부터는 실기기/에뮬레이터 없이는
-"짠 코드가 실제로 동작하는지" 증명할 방법이 없어서 일단 멈췄습니다.
+### 검증 상태가 층마다 다릅니다 — 정확히 무엇을 확인했고 안 했는지
+
+**서버(전부 검증됨)**: `PUSH_DRIVER=fcm`으로 실제 Firebase 서버에 발송 요청을 보내고
+응답을 받는 것까지 테스트로 확인했습니다(`tests/pushFcm.test.ts`).
+
+**앱의 TypeScript 코드(타입체크·번들만 검증됨, 기능은 미검증)**: 푸시 수신 → 음성 파일
+다운로드 → iOS 로컬 알림 예약까지 순수 JS/expo-notifications 로 작성했습니다.
+`npm run typecheck`, `npm test`, `npx expo export` 는 전부 통과합니다. 하지만 **이건
+"코드가 컴파일된다"는 것이지 "기기에서 실제로 알림이 울린다"는 게 아닙니다.** 특히
+`src/alarms/paths.ts` 의 iOS `Library/Sounds` 경로 유도는 공식 API가 아니라 샌드박스
+구조를 추정해서 만든 것이라 iOS 기기에서 가장 먼저 의심해 볼 지점입니다.
+
+**Android 네이티브 모듈(코드만 있음, 컴파일도 안 해봄)**: AlarmManager, 풀스크린 인텐트,
+Foreground Service, STREAM_ALARM 재생, 재부팅 복구를 전부 Kotlin으로 작성했습니다.
+이 컨테이너에는 Android SDK/Gradle 툴체인이 없어서 **한 번도 컴파일해 보지 못했습니다.**
+브레이스/괄호 짝은 스크립트로 확인했고 Expo Modules API 문법은 이미 설치된 다른 Expo
+모듈들의 실제 소스코드를 읽어서 맞췄지만, 그 이상의 확신은 드릴 수 없습니다.
+`modules/voicealarm-alarm/README.md` 에 "빌드 에러 나면 여기부터 의심" 목록을 남겨
+뒀습니다 — 처음 `expo run:android` 하실 때 참고하세요.
 
 ---
 
@@ -301,12 +348,21 @@ npm test
 cd voicealarm/app
 npm install
 
+# Android 는 로컬 네이티브 모듈(modules/voicealarm-alarm)이 있으므로 prebuild 로
+# 네이티브 프로젝트를 먼저 만드는 걸 권장합니다. 이 모듈은 컴파일 검증이 안 된
+# 상태라(README 상단 참고) 여기서 처음으로 빌드 에러가 날 가능성이 있습니다.
+npx expo prebuild --platform android
+# android/settings.gradle 에 voicealarm-alarm 이 포함됐는지 확인하세요.
+
 # 개발 빌드를 한 번 만든다 (이후에는 npm start 만으로 붙는다)
 npx expo run:android     # Android Studio + SDK 필요
 npx expo run:ios         # macOS + Xcode 필요
 
 npm start                # 이미 dev client 가 설치된 기기/에뮬레이터에 연결
 ```
+
+Android 빌드가 실패하면 `app/modules/voicealarm-alarm/README.md` 의 "자주 틀렸을 만한
+지점" 목록부터 확인하세요 — 어떤 Gradle 좌표나 API 가 의심스러운지 미리 적어 뒀습니다.
 
 ### API 주소 설정
 
@@ -329,10 +385,16 @@ npm run typecheck
 ```
 ✓ tests/client.test.ts    (9) — 토큰 자동 재발급, 동시 요청 single-flight, 에러 변환
 ✓ tests/upload.test.ts    (6) — 업로드 3단계 순서, 레벨 정규화, 시간 표기
+✓ tests/pushPayload.test.ts (6) — FCM data 페이로드 파싱 (예약/취소, 이중 JSON 언랩)
 ✓ tests/i18n.test.ts      (6) — 키 일치, 자리표시자 일치
 ✓ tests/errorMessage.test.ts (4) — 서버 코드 → 화면 언어 매핑
 ✓ tests/integration.test.ts (10) — 실제 서버 연동: 친구/차단/업로드/알람 예약~ack (기본은 건너뜀)
 ```
+
+`pushPayload.test.ts` 가 검증하는 건 딱 파싱 로직까지입니다. 그 뒤로 이어지는
+prefetch(`alarms/prefetch.ts`)·iOS 스케줄링(`alarms/iosAlarm.ts`)·Android 네이티브 호출
+(`alarms/androidAlarm.ts`)은 전부 RN 런타임/네이티브 모듈에 의존해서 vitest 로 테스트할
+수 없습니다 — 위에서 여러 번 말씀드린 "실기기 검증 필요" 부분입니다.
 
 **실서버 연동 테스트**는 목으로는 못 잡는 경로 오타·필드명 불일치를 잡습니다.
 ffmpeg 로 진짜 m4a 를 만들어 올려서, 30초 제한과 caf 변환까지 실제로 확인합니다.
@@ -447,20 +509,19 @@ URL 이 우리 서버를 가리키지만, S3 어댑터를 붙이면 같은 응�
 
 다크 모드는 기기 설정을 따르고, 한국어/영어 i18n 구조가 잡혀 있습니다(기준은 한국어).
 
-**"알람 보내기"를 눌러서 실제로 상대 기기가 울리는가?** 아직 아닙니다. 위 화면은 서버에
-알람을 예약하는 데까지만입니다. 수신 기기가 그걸 받아서 로컬 알람으로 등록하고 실제로
-울리게 하는 부분(이 README 맨 위 아키텍처의 오른쪽 절반)은 다음 섹션에서 설명하는 대로
-아직 없습니다.
+**"알람 보내기"를 눌러서 실제로 상대 기기가 울리는가?** 코드상으로는 예약부터 수신 기기의
+로컬 알람 등록까지 전 구간이 연결돼 있습니다. 다만 방금 말씀드린 대로 Android 는
+컴파일도 안 해본 상태, iOS 도 실기기 검증이 안 된 상태라 **"실제로 울린다"고 말씀드릴
+단계는 아직 아닙니다.** 실기기 확인이 이 프로젝트의 다음 할 일입니다.
 
-### Phase 4 에서 아직 없는 것
+### Phase 4 에서 여전히 없는 것 (다음 단계로 넘어가지 않은 이유가 아니라, 범위 밖)
 
-- 앱의 푸시 토큰 등록 (`POST /devices`는 Phase 1부터 있지만, 앱이 실제 FCM 토큰을 받아
-  호출하는 코드가 없음)
-- 백그라운드 데이터 푸시 수신 → 음성 파일 사전 다운로드
-- **Android**: `AlarmManager.setAlarmClock()` 등록, 풀스크린 인텐트 발화 화면,
-  `STREAM_ALARM` 재생, `BOOT_COMPLETED` 재등록 — 전부 네이티브 Kotlin 코드 필요
-- **iOS**: `UNCalendarNotificationTrigger` 등록, caf 사운드를 `Library/Sounds/`에 배치
+- iOS FCM 토큰 브리징 — `usePushRegistration.ts` 에 적어 뒀듯, iOS 에서 얻는 건 raw APNs
+  토큰이라 서버의 firebase-admin 발송과 안 맞습니다. `@react-native-firebase/messaging`
+  같은 걸로 APNs↔FCM 토큰 교환을 하거나, 서버에 iOS 전용 직접 APNs 발송 경로를 추가해야
+  합니다. Android 검증이 끝난 뒤 iOS 를 붙일 때 같이 해결할 문제로 남겨 뒀습니다.
 - `POST /reports` (신고, Phase 5 항목)
+- 남용 방지 한도, 심야 예약 확인 다이얼로그 (Phase 5 항목)
 
 ---
 
@@ -507,14 +568,6 @@ URL 이 우리 서버를 가리키지만, S3 어댑터를 붙이면 같은 응�
 
 ## 내가(사용자가) 직접 해야 하는 일
 
-### 지금 (Phase 2~3 확인용)
-- [ ] **ffmpeg 설치** — 없으면 녹음 등록이 전부 실패합니다
-- [ ] **Android**: Android Studio + SDK 설치 → `npx expo run:android`
-- [ ] **iOS**: macOS + Xcode 필요 → `npx expo run:ios` (Windows/Linux 에서는 불가)
-- [ ] 서버를 켜고(`npm run db:up && npm run dev`), 실기기라면 `app.json` 의
-      `extra.apiBaseUrl` 을 PC 의 LAN IP 로 변경
-- [ ] 두 계정으로 가입 → 아이디 검색 → 요청 → 수락 → 차단까지 눌러 보기
-
 ### Firebase — 완료
 - [x] Firebase 프로젝트 생성
 - [x] Android 앱 등록 → `google-services.json` (`voicealarm/app/`, gitignore 처리됨)
@@ -522,13 +575,27 @@ URL 이 우리 서버를 가리키지만, S3 어댑터를 붙이면 같은 응�
 - [x] 서버용 서비스 계정 키 → `voicealarm/server/firebase-service-account.json` (gitignore 처리됨).
       서버에서 `PUSH_DRIVER=fcm`으로 실제 발송 확인함(`tests/pushFcm.test.ts`)
 
-### 남은 것 — 실기기/에뮬레이터가 있어야 다음 단계 진행 가능
-- [ ] **Android**: Android Studio + SDK 설치 → `npx expo run:android` (에뮬레이터도 가능)
-- [ ] **iOS**: macOS + Xcode 필요 → `npx expo run:ios` (시뮬레이터도 가능하나 실제 알림
-      수신·백그라운드 동작은 실기기가 아니면 정확히 확인되지 않음)
-- [ ] iOS 실기기 1대 이상 (푸시·알람은 시뮬레이터에서 제한적으로만 동작)
+### 다음 — Android 네이티브 모듈 실기기 검증 (지금 가장 중요한 단계)
+- [ ] **ffmpeg 설치** — 없으면 녹음 등록이 전부 실패합니다(서버 쪽, Phase 3부터 필요)
+- [ ] Android Studio + SDK 설치
+- [ ] `cd voicealarm/app && npx expo prebuild --platform android` 실행 →
+      `android/settings.gradle` 에 `voicealarm-alarm` 이 포함됐는지 확인
+- [ ] `npx expo run:android` — **여기서 Kotlin 컴파일 에러가 날 가능성이 있습니다.**
+      나면 에러 메시지를 그대로 알려주세요, 고치겠습니다
+      (`app/modules/voicealarm-alarm/README.md` 에 의심 지점을 미리 적어 뒀습니다)
+- [ ] 서버를 `PUSH_DRIVER=fcm` 으로 켜고(`.env` 에 설정), 실기기/에뮬레이터라면 `app.json` 의
+      `extra.apiBaseUrl` 을 PC 의 LAN IP 로 변경
+- [ ] 두 계정으로 가입 → 친구 요청 → 수락 → 알람 예약까지 눌러 보고,
+      `app/modules/voicealarm-alarm/README.md` 의 확인 체크리스트(잠금화면 발화, 다시 알림,
+      해제, 재부팅 복구, 차단 시 무효화, 비행기 모드)를 하나씩 확인
+
+### 그 다음 — iOS
+- [ ] macOS + Xcode, iOS 실기기 1대 이상(시뮬레이터는 백그라운드 푸시·알림이 제한적)
 - [ ] **Apple Developer Program** — iOS 로컬 알림 서명·배포에 필요 (연 $99). Critical Alerts는
       [프로젝트 방침](#프로젝트-방침-별도-승인이-필요한-기능은-쓰지-않는다)상 신청하지 않습니다
+- [ ] `npx expo run:ios` 로 빌드 후 `src/alarms/paths.ts` 의 Library 경로 유도가 실제로
+      맞는지 가장 먼저 확인 (안 맞으면 커스텀 알림음이 무음으로 울립니다)
+- [ ] iOS FCM 토큰 브리징 미해결 상태 — README의 "Phase 4에서 여전히 없는 것" 참고
 
 ### 스토어 심사 대비
 - [ ] 개인정보처리방침 URL (음성 녹음을 다루므로 필수)
